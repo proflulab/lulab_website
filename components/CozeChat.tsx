@@ -45,7 +45,7 @@ declare global {
                         el?: HTMLElement;
                     };
                     userInfo: {
-                        id: '12345';
+                        id: string;  // 修改为 string 类型
                         url: string;
                         nickname: string;
                     };

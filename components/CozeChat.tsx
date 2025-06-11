@@ -45,20 +45,26 @@ declare global {
                         el?: HTMLElement;
                     };
                     userInfo: {
-                        id: string;  // 修改为 string 类型
+                        id: string;
                         url: string;
                         nickname: string;
                     };
                 };
-            }) => void;
+            }) => CozeWebChatInstance;
         };
     }
+}
+
+// 添加 CozeWebChatInstance 接口定义
+interface CozeWebChatInstance {
+    destroy?: () => void;
+    // 可以根据需要添加其他方法
 }
 
 export default function CozeChat() {
     const t = useTranslations('CozeChat');
     const cozeChatContainerRef = useRef<HTMLDivElement>(null);
-    const instanceRef = useRef<any>(null);
+    const instanceRef = useRef<CozeWebChatInstance | null>(null);
 
     const cleanupCoze = () => {
         // 清理现有实例

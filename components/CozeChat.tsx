@@ -10,7 +10,7 @@
  */
 'use client';
 
-import { useEffect, useRef } from 'react';
+import { useEffect, useRef, useState } from 'react';
 import { useTranslations } from 'next-intl';
 
 declare global {
@@ -65,6 +65,7 @@ export default function CozeChat() {
     const t = useTranslations('CozeChat');
     const cozeChatContainerRef = useRef<HTMLDivElement>(null);
     const instanceRef = useRef<CozeWebChatInstance | null>(null);
+    const [isMobile, setIsMobile] = useState(false);
 
     const cleanupCoze = () => {
         // 清理现有实例
@@ -89,6 +90,23 @@ export default function CozeChat() {
             });
         });
     };
+
+    useEffect(() => {
+        // 检测屏幕尺寸
+        const checkScreenSize = () => {
+            setIsMobile(window.innerWidth <= 768);
+        };
+        
+        // 初始检测
+        checkScreenSize();
+        
+        // 添加窗口大小变化监听器
+        window.addEventListener('resize', checkScreenSize);
+        
+        return () => {
+            window.removeEventListener('resize', checkScreenSize);
+        };
+    }, []);
 
     useEffect(() => {
         let isMounted = true;
@@ -120,7 +138,7 @@ export default function CozeChat() {
 
             const config = {
                 config: {
-                    bot_id: '7499463698092867610',
+                    bot_id: process.env.NEXT_PUBLIC_COZE_BOT_ID || '',
                 },
                 componentProps: {
                     title: t('botchat')
@@ -132,8 +150,8 @@ export default function CozeChat() {
                 },
                 ui: {
                     base: {
-                        icon: 'https://img-bsy.txrpic.com/preview/Element/00/00/89/11/E-891182-2418FE26A.png?imageMogr2/quality/90/thumbnail/320x%3E',
-                        layout: 'pc',
+                        icon: 'https://i.postimg.cc/909T36tF/Chat-GPT-Image-2025-6-14-09-45-06.png',
+                        layout: isMobile ? 'mobile' : 'pc',
                         zIndex: 1000,
                     },
                     footer: {
@@ -196,21 +214,41 @@ export default function CozeChat() {
             isMounted = false;
             cleanupCoze();
         };
-    }, [t]); // 依赖翻译函数，语言变化时重新初始化
+    }, [t, isMobile]); // 依赖翻译函数和屏幕尺寸，变化时重新初始化
+
+    // 获取响应式样式
+    const getResponsiveStyles = () => {
+        if (isMobile) {
+            return {
+                display: 'none',
+                width: 'calc(100vw - 20px)',
+                height: '70vh',
+                maxWidth: '400px',
+                position: 'fixed' as const,
+                bottom: '20px',
+                right: '10px',
+                zIndex: 1000,
+                borderRadius: '12px',
+                boxShadow: '0 4px 20px rgba(0, 0, 0, 0.15)',
+            };
+        } else {
+            return {
+                display: 'none',
+                width: '460px',
+                height: '80%',
+                position: 'fixed' as const,
+                bottom: '20px',
+                right: '20px',
+                zIndex: 1000,
+            };
+        }
+    };
 
     return (
         <div
             ref={cozeChatContainerRef}
             id="coze-chat-container"
-            style={{
-                display: 'none',
-                width: '460px',
-                height: '80%',
-                position: 'fixed',
-                bottom: '20px',
-                right: '20px',
-                zIndex: 1000,
-            }}
+            style={getResponsiveStyles()}
         />
     );
 }

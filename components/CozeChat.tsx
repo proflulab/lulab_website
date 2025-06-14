@@ -119,26 +119,28 @@ export default function CozeChat() {
             // 清理之前的实例
             cleanupCoze();
             
-            // 获取token
+            // 获取token和botId
             let token = null;
+            let botId = null;
             try {
                 const response = await fetch('/api/coze-token', { method: 'POST' });
                 if (response.ok) {
                     const data = await response.json();
                     token = data.token;
+                    botId = data.botId;
                 }
             } catch (error) {
-                console.error('Failed to fetch Coze token:', error);
+                console.error('Failed to fetch Coze token and botId:', error);
                 return;
             }
 
-            if (!token || !isMounted) {
+            if (!token || !botId || !isMounted) {
                 return;
             }
 
             const config = {
                 config: {
-                    bot_id: process.env.NEXT_PUBLIC_COZE_BOT_ID || '',
+                    bot_id: botId,
                 },
                 componentProps: {
                     title: t('botchat')

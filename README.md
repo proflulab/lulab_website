@@ -1,4 +1,14 @@
-This is a [Next.js](https://nextjs.org) project bootstrapped with [`create-next-app`](https://nextjs.org/docs/app/api-reference/cli/create-next-app).
+This is a [Next.js](https://nextjs.org/) project bootstrapped with [`create-next-app`](https://github.com/vercel/next.js/tree/canary/packages/create-next-app).
+
+## 环境变量配置
+
+在开始开发之前，请先配置环境变量：
+
+1. 复制 `.env.example` 文件为 `.env.local`
+2. 填入你的环境变量值，特别是 `DATABASE_URL`
+3. 确保数据库连接正常
+
+详细的部署配置请参考 [DEPLOYMENT.md](./DEPLOYMENT.md)。
 
 ## Getting Started
 

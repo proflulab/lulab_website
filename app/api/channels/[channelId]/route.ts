@@ -8,9 +8,7 @@
  */
 
 import { NextResponse } from 'next/server';
-import { neon } from '@neondatabase/serverless';
-
-const sql = neon(process.env.DATABASE_URL as string);
+import { sql } from '@/lib/db/connection';
 
 // 删除特定渠道
 export async function DELETE(request: Request, { params }: { params: { channelId: string } }) {

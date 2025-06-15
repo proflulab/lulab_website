@@ -1,8 +1,6 @@
 import { NextResponse } from 'next/server'
 import { headers } from 'next/headers'
-import { neon } from '@neondatabase/serverless';
-
-const sql = neon(process.env.DATABASE_URL as string);
+import { sql } from '@/lib/db/connection';
 import { stripe, Stripe } from '../../../../lib/stripe'
 
 export async function POST(request: Request) {

@@ -8,9 +8,7 @@
  */
 
 import { NextResponse } from 'next/server';
-import { neon } from '@neondatabase/serverless';
-
-const sql = neon(process.env.DATABASE_URL as string);
+import { sql } from '@/lib/db/connection';
 
 // 获取所有渠道
 export async function GET() {

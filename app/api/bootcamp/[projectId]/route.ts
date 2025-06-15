@@ -8,9 +8,7 @@
  */
 
 import { NextResponse } from 'next/server';
-import { neon } from '@neondatabase/serverless';
-
-const sql = neon(process.env.DATABASE_URL as string);
+import { sql } from '@/lib/db/connection';
 
 export async function GET(req: Request, { params }: { params: { projectId: string } }) {
     const { projectId } = params;

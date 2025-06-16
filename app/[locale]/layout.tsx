@@ -14,7 +14,6 @@ import { getMessages } from 'next-intl/server';
 import React from 'react';
 import "./globals.css";
 import { Toaster } from "@/components/ui/toaster"
-import ChatWidget from '@/components/CozeChat'
 
 export const metadata = {
   title: {

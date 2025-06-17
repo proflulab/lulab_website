@@ -249,6 +249,4 @@ export default function CozeChat() {
             style={getResponsiveStyles()}
         />
     );
-};
-
-export default CozeChat;
+}

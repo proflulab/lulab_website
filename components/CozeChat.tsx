@@ -170,12 +170,12 @@ export default function CozeChat() {
                     chatBot: {
                         title: t('botchat'),
                         el: cozeChatContainerRef.current
-                    },
-                    userInfo: {
-                        id: '12345',
-                        url: 'https://lf-coze-web-cdn.coze.cn/obj/coze-web-cn/obric/coze/favicon.1970.png',
-                        nickname: 'UserA',
                     }
+                },
+                userInfo: {
+                    id: '12345',
+                    url: 'https://lf-coze-web-cdn.coze.cn/obj/coze-web-cn/obric/coze/favicon.1970.png',
+                    nickname: 'UserA'
                 }
             };
 

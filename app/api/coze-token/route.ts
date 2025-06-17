@@ -2,8 +2,8 @@ import { NextResponse } from 'next/server';
 
 // 将 GET 方法更改为 POST
 export async function POST() {
-    const cozeToken = 'pat_a8wiVCQqT8mX67X3Z2KkOjMWYfQb7GbSllCfPqSAimROvpAYzFmCNM2IJwoc015M';
-    const cozeBotId = '7499463698092867610';
+    const cozeToken = process.env.cozeToken;
+    const cozeBotId = process.env.cozeID; 
 
     if (!cozeToken) {
         console.error("COZE_TOKEN is not set in server environment");

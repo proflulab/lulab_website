@@ -25,6 +25,8 @@ export const metadata = {
   authors: [{ name: '陆向谦实验室 Lu Lab' }],
   creator: '陆向谦实验室 Lu Lab',
   publisher: '陆向谦实验室 Lu Lab',
+  category: 'education',
+  classification: 'Educational Technology',
   robots: {
     index: true,
     follow: true,
@@ -50,11 +52,16 @@ export const metadata = {
         width: 1200,
         height: 630,
         alt: '陆向谦实验室 - Lu Lab',
+        type: 'image/svg+xml',
       },
     ],
+    videos: [],
+    audio: [],
   },
   twitter: {
     card: 'summary_large_image',
+    site: '@LuLab_Official',
+    creator: '@LuXiangqian',
     title: '陆向谦实验室 - Lu Lab | 创新教育与创业实践平台',
     description: '陆向谦实验室(Lu Lab)致力于培养具备全球视野与创新精神的复合型人才，通过项目式学习、实践驱动的教育模式，打造创新时代的教育革新平台。',
     images: ['https://www.lulabs.org/images/logo.svg'],
@@ -63,6 +70,11 @@ export const metadata = {
     google: 'your-google-verification-code',
     yandex: 'your-yandex-verification-code',
     yahoo: 'your-yahoo-verification-code',
+    other: {
+      'baidu-site-verification': 'your-baidu-verification-code',
+      'sogou_site_verification': 'your-sogou-verification-code',
+      '360-site-verification': 'your-360-verification-code',
+    },
   },
   alternates: {
     canonical: 'https://www.lulabs.org/',
@@ -70,6 +82,49 @@ export const metadata = {
       'zh-CN': 'https://www.lulabs.org/zh',
       'en-US': 'https://www.lulabs.org/en',
     },
+    types: {
+      'application/rss+xml': 'https://www.lulabs.org/rss.xml',
+      'application/atom+xml': 'https://www.lulabs.org/atom.xml',
+    },
+  },
+  manifest: '/manifest.json',
+  appleWebApp: {
+    capable: true,
+    title: 'Lu Lab',
+    statusBarStyle: 'default',
+  },
+  formatDetection: {
+    telephone: false,
+    date: false,
+    address: false,
+    email: false,
+    url: false,
+  },
+  metadataBase: new URL('https://www.lulabs.org'),
+  referrer: 'origin-when-cross-origin',
+  themeColor: [
+    { media: '(prefers-color-scheme: light)', color: '#ffffff' },
+    { media: '(prefers-color-scheme: dark)', color: '#000000' },
+  ],
+  colorScheme: 'light dark',
+  viewport: {
+    width: 'device-width',
+    initialScale: 1,
+    maximumScale: 5,
+    userScalable: true,
+  },
+  icons: {
+    icon: [
+      { url: '/favicon.ico', sizes: '32x32' },
+      { url: '/icon-192.png', sizes: '192x192', type: 'image/png' },
+      { url: '/icon-512.png', sizes: '512x512', type: 'image/png' },
+    ],
+    apple: [
+      { url: '/apple-touch-icon.png', sizes: '180x180', type: 'image/png' },
+    ],
+    other: [
+      { rel: 'mask-icon', url: '/safari-pinned-tab.svg', color: '#000000' },
+    ],
   },
 };
 

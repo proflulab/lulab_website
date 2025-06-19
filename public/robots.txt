@@ -1,0 +1,12 @@
+User-agent: *
+Allow: /
+
+# 禁止爬取管理页面
+Disallow: /admin/
+Disallow: /api/
+Disallow: /checkout/
+Disallow: /login/
+Disallow: /return/
+
+# Sitemap位置
+Sitemap: https://your-domain.com/sitemap.xml

@@ -10,15 +10,82 @@
  */
 
 import { NextIntlClientProvider } from 'next-intl';
-import { getMessages } from 'next-intl/server';
+import { getMessages, getTranslations } from 'next-intl/server';
 import React from 'react';
 import "./globals.css";
 import { Toaster } from "@/components/ui/toaster"
+import { Metadata } from 'next';
 
-export const metadata = {
-  title: 'Lu Lab',
-  description: 'Lu Lab Website',
+type Props = {
+  params: { locale: string };
 };
+
+export async function generateMetadata({ params: { locale } }: Props): Promise<Metadata> {
+  const t = await getTranslations({ locale, namespace: 'metadata' });
+  
+  return {
+    title: {
+      template: '%s | Lu Lab',
+      default: 'Lu Lab - 创新教育与科技研究实验室'
+    },
+    description: t('description'),
+    keywords: ['教育', '科技', '研究', '实验室', 'bootcamp', '编程', '人工智能'],
+    authors: [{ name: 'Lu Lab' }],
+    creator: 'Lu Lab',
+    publisher: 'Lu Lab',
+    formatDetection: {
+      email: false,
+      address: false,
+      telephone: false,
+    },
+    metadataBase: new URL('https://your-domain.com'),
+    alternates: {
+      canonical: `/${locale}`,
+      languages: {
+        'zh': '/zh',
+        'en': '/en',
+      },
+    },
+    openGraph: {
+      title: 'Lu Lab - 创新教育与科技研究实验室',
+      description: t('description'),
+      url: 'https://your-domain.com',
+      siteName: 'Lu Lab',
+      images: [
+        {
+          url: '/images/logo.svg',
+          width: 1200,
+          height: 630,
+          alt: 'Lu Lab Logo',
+        },
+      ],
+      locale: locale,
+      type: 'website',
+    },
+    twitter: {
+      card: 'summary_large_image',
+      title: 'Lu Lab - 创新教育与科技研究实验室',
+      description: t('description'),
+      images: ['/images/logo.svg'],
+    },
+    robots: {
+      index: true,
+      follow: true,
+      googleBot: {
+        index: true,
+        follow: true,
+        'max-video-preview': -1,
+        'max-image-preview': 'large',
+        'max-snippet': -1,
+      },
+    },
+    verification: {
+      google: 'your-google-verification-code',
+      // yandex: 'your-yandex-verification-code',
+      // yahoo: 'your-yahoo-verification-code',
+    },
+  };
+}
 
 export default async function RootLayout({
   children,
@@ -35,6 +102,8 @@ export default async function RootLayout({
       <head>
         <meta charSet="utf-8" />
         <meta name="viewport" content="width=device-width, initial-scale=1" />
+        <link rel="icon" href="/favicon.ico" />
+        <link rel="apple-touch-icon" href="/images/logo.svg" />
       </head>
       <body>
         <NextIntlClientProvider messages={messages}>

@@ -17,10 +17,55 @@ import { Mission } from "@/components/about/mission";
 import { Philosophy } from "@/components/about/philosophy";
 import { Origin } from "@/components/about/origin";
 import { Timeline } from "@/components/about/timeline";
+import { Metadata } from 'next';
+import { getTranslations } from 'next-intl/server';
+
+type Props = {
+  params: { locale: string };
+};
+
+export async function generateMetadata({ params: { locale } }: Props): Promise<Metadata> {
+  const t = await getTranslations({ locale, namespace: 'about' });
+  
+  return {
+    title: t('title'),
+    description: t('description'),
+    openGraph: {
+      title: t('title'),
+      description: t('description'),
+      images: ['/images/about/hero-image.jpg'],
+    },
+    alternates: {
+      canonical: `/${locale}/about`,
+      languages: {
+        'zh': '/zh/about',
+        'en': '/en/about',
+      },
+    },
+  };
+}
 
 export default function About() {
   return (
     <main className="flex flex-col w-full scroll-smooth">
+      {/* 添加结构化数据 */}
+      <script
+        type="application/ld+json"
+        dangerouslySetInnerHTML={{
+          __html: JSON.stringify({
+            "@context": "https://schema.org",
+            "@type": "Organization",
+            "name": "Lu Lab",
+            "description": "创新教育与科技研究实验室",
+            "url": "https://your-domain.com",
+            "logo": "https://your-domain.com/images/logo.svg",
+            "sameAs": [
+              // 添加社交媒体链接
+            ]
+          })
+        }}
+      />
+      
       <section className="w-full h-[30vh] md:h-[calc(100vh-64px)]">
         <Carousel />
       </section>

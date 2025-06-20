@@ -9,7 +9,6 @@
  * Copyright (c) 2024 by ${git_name_email}, All Rights Reserved. 
  */
 /* eslint-disable @next/next/no-img-element */
-"use client";
 
 import { Carousel } from "@/components/about/carousel";
 import { Founder } from "@/components/about/founder";
@@ -21,10 +20,11 @@ import { Metadata } from 'next';
 import { getTranslations } from 'next-intl/server';
 
 type Props = {
-  params: { locale: string };
+  params: Promise<{ locale: string }>;
 };
 
-export async function generateMetadata({ params: { locale } }: Props): Promise<Metadata> {
+export async function generateMetadata({ params }: Props): Promise<Metadata> {
+  const { locale } = await params;
   const t = await getTranslations({ locale, namespace: 'about' });
   
   return {

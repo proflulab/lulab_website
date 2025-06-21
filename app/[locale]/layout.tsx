@@ -16,11 +16,16 @@ import "./globals.css";
 import { Toaster } from "@/components/ui/toaster"
 
 export const metadata = {
+<<<<<<< HEAD
   title: {
     default: "陆向谦实验室 Lu Lab",
     template: "%s | 陆向谦实验室 Lu Lab",
   },
 
+=======
+  title: 'Lu Lab',
+  description: 'Lu Lab Website',
+>>>>>>> parent of 7d8c7ba (feat(seo): 添加SEO优化相关配置)
 };
 
 export default async function RootLayout({
@@ -58,6 +63,7 @@ export default async function RootLayout({
       <head>
         <meta charSet="utf-8" />
         <meta name="viewport" content="width=device-width, initial-scale=1" />
+<<<<<<< HEAD
         <meta name="keywords" content="陆向谦,Lu Lab,陆向谦实验室,Lu Lab实验室,创新教育,创业实践,项目式学习,清华经管,创新创业,教育革新,复合型人才,陆向谦教授" />
         <meta name="author" content="陆向谦实验室 Lu Lab" />
         <meta name="robots" content="index,follow" />
@@ -98,6 +104,8 @@ export default async function RootLayout({
         
         {/* 预连接 */}
         <link rel="preconnect" href="https://fonts.gstatic.com" crossOrigin="anonymous" />
+=======
+>>>>>>> parent of 7d8c7ba (feat(seo): 添加SEO优化相关配置)
       </head>
       <body>
         <NextIntlClientProvider messages={messages}>

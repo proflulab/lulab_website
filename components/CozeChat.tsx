@@ -27,6 +27,11 @@ declare global {
                     type: string;
                     token: string;
                     onRefreshToken: () => string;
+                userInfo: {
+                    id: string;
+                    url: string;
+                    nickname: string;
+                    };
                 };
                 ui: {
                     base: {
@@ -43,11 +48,6 @@ declare global {
                     chatBot: {
                         title: string;
                         el?: HTMLElement;
-                    };
-                    userInfo: {
-                        id: string;
-                        url: string;
-                        nickname: string;
                     };
                 };
             }) => CozeWebChatInstance;
@@ -119,26 +119,28 @@ export default function CozeChat() {
             // 清理之前的实例
             cleanupCoze();
             
-            // 获取token
+            // 获取token和botId
             let token = null;
+            let botId = null;
             try {
                 const response = await fetch('/api/coze-token', { method: 'POST' });
                 if (response.ok) {
                     const data = await response.json();
                     token = data.token;
+                    botId = data.botId;
                 }
             } catch (error) {
-                console.error('Failed to fetch Coze token:', error);
+                console.error('Failed to fetch Coze token and botId:', error);
                 return;
             }
 
-            if (!token || !isMounted) {
+            if (!token || !botId || !isMounted) {
                 return;
             }
 
             const config = {
                 config: {
-                    bot_id: process.env.NEXT_PUBLIC_COZE_BOT_ID || '',
+                    bot_id: botId,
                 },
                 componentProps: {
                     title: t('botchat')
@@ -146,7 +148,12 @@ export default function CozeChat() {
                 auth: {
                     type: 'token',
                     token: token,
-                    onRefreshToken: () => token
+                    onRefreshToken: () => token,
+                    userInfo: {
+                        id: '12345',
+                        url: 'https://lf-coze-web-cdn.coze.cn/obj/coze-web-cn/obric/coze/favicon.1970.png',
+                        nickname: 'User',
+                    }
                 },
                 ui: {
                     base: {
@@ -163,26 +170,17 @@ export default function CozeChat() {
                     chatBot: {
                         title: t('botchat'),
                         el: cozeChatContainerRef.current
-                    },
-                    userInfo: {
-                        id: '12345',
-                        url: 'https://lf-coze-web-cdn.coze.cn/obj/coze-web-cn/obric/coze/favicon.1970.png',
-                        nickname: 'UserA',
                     }
+                },
+                userInfo: {
+                    id: '12345',
+                    url: 'https://lf-coze-web-cdn.coze.cn/obj/coze-web-cn/obric/coze/favicon.1970.png',
+                    nickname: 'UserA'
                 }
             };
 
             try {
-                instanceRef.current = new window.CozeWebSDK.WebChatClient({
-                    ...config,
-                    ui: {
-                        ...config.ui,
-                        userInfo: {
-                            ...config.ui.userInfo,
-                            id: '12345' as const // 将 id 类型固定为字面量类型 "12345"
-                        }
-                    }
-                });
+                instanceRef.current = new window.CozeWebSDK.WebChatClient(config);
                 if (isMounted && cozeChatContainerRef.current) {
                     cozeChatContainerRef.current.style.display = 'block';
                 }

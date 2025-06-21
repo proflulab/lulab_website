@@ -187,6 +187,9 @@
       ]
     }
   },
+  "CoreChat": {
+    "botchat": "AI客服"
+  },
   "BootcampPage": {
     "Hero": {
       "title": "在训练营",

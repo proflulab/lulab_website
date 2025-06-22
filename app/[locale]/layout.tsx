@@ -15,6 +15,7 @@ import React from 'react';
 import "./globals.css";
 import { Toaster } from "@/components/ui/toaster"
 import { Metadata } from 'next';
+import { DefaultSeo } from 'next-seo';
 
 type Props = {
   params: Promise<{ locale: string }>;
@@ -50,11 +51,11 @@ export async function generateMetadata({ params }: Props): Promise<Metadata> {
     openGraph: {
       title: 'Lu Lab - 创新教育与科技研究实验室',
       description: t('description'),
-      url: 'https://your-domain.com',
+      url: 'https://www.lulabs.org/',
       siteName: 'Lu Lab',
       images: [
         {
-          url: '/images/logo.svg',
+          url: 'https://th.bing.com/th/id/OIP.-bOs2je0XBIzmVk1251XtgHaHa?rs=1&pid=ImgDetMain',
           width: 1200,
           height: 630,
           alt: 'Lu Lab Logo',
@@ -65,9 +66,9 @@ export async function generateMetadata({ params }: Props): Promise<Metadata> {
     },
     twitter: {
       card: 'summary_large_image',
-      title: 'Lu Lab - 创新教育与科技研究实验室',
-      description: t('description'),
-      images: ['/images/logo.svg'],
+      title: 'Lu Lab',
+      description: t('陆向谦实验室的创立源于陆教授对自己两个孩子教育的深切思考。在香港科技大学教授数理金融期间，他见证了互联网浪潮的兴起，预见了技术革命带来的机遇，随即开始创业并实现财务自由。'),
+      images: ['https://th.bing.com/th/id/OIP.-bOs2je0XBIzmVk1251XtgHaHa?rs=1&pid=ImgDetMain'],
     },
     robots: {
       index: true,
@@ -80,15 +81,10 @@ export async function generateMetadata({ params }: Props): Promise<Metadata> {
         'max-snippet': -1,
       },
     },
-    verification: {
-      google: 'your-google-verification-code',
-      // yandex: 'your-yandex-verification-code',
-      // yahoo: 'your-yahoo-verification-code',
-    },
   };
 }
 
-export default async function RootLayout({
+async function RootLayout({
   children,
   params: { locale }
 }: {
@@ -116,4 +112,28 @@ export default async function RootLayout({
       </body>
     </html>
   )
+}
+
+export default function Layout({ children }: { children: React.ReactNode }) {
+  return (
+    <>
+      <DefaultSeo
+        titleTemplate="Lu Lab"
+        defaultTitle="Lu Lab"
+        description="陆向谦实验室的创立源于陆教授对自己两个孩子教育的深切思考。在香港科技大学教授数理金融期间，他见证了互联网浪潮的兴起，预见了技术革命带来的机遇，随即开始创业并实现财务自由。"
+        openGraph={{
+          type: 'website',
+          locale: 'en_US',
+          url: 'https://www.lulabs.org',
+          site_name: 'Lu Lab',
+        }}
+        twitter={{
+          handle: '@handle',
+          site: '@site',
+          cardType: 'summary_large_image',
+        }}
+      />
+      {children}
+    </>
+  );
 }

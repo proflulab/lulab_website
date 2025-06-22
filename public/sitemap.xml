@@ -1,0 +1,59 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<urlset xmlns="http://www.sitemaps.org/schemas/sitemap/0.9" xmlns:xhtml="http://www.w3.org/1999/xhtml">
+  <url>
+    <loc>https://dev.lulabs.cn/</loc>
+    <lastmod>2024-12-28</lastmod>
+    <changefreq>weekly</changefreq>
+    <priority>1.0</priority>
+    <xhtml:link rel="alternate" hreflang="zh-CN" href="https://dev.lulabs.cn/zh" />
+    <xhtml:link rel="alternate" hreflang="en-US" href="https://dev.lulabs.cn/en" />
+  </url>
+  <url>
+    <loc>https://dev.lulabs.cn/zh</loc>
+    <lastmod>2024-12-28</lastmod>
+    <changefreq>weekly</changefreq>
+    <priority>1.0</priority>
+    <xhtml:link rel="alternate" hreflang="zh-CN" href="https://dev.lulabs.cn/zh" />
+    <xhtml:link rel="alternate" hreflang="en-US" href="https://dev.lulabs.cn/en" />
+  </url>
+  <url>
+    <loc>https://dev.lulabs.cn/en</loc>
+    <lastmod>2024-12-28</lastmod>
+    <changefreq>weekly</changefreq>
+    <priority>1.0</priority>
+    <xhtml:link rel="alternate" hreflang="zh-CN" href="https://dev.lulabs.cn/zh" />
+    <xhtml:link rel="alternate" hreflang="en-US" href="https://dev.lulabs.cn/en" />
+  </url>
+  <url>
+    <loc>https://dev.lulabs.cn/zh/bootcamp</loc>
+    <lastmod>2024-12-28</lastmod>
+    <changefreq>weekly</changefreq>
+    <priority>0.9</priority>
+    <xhtml:link rel="alternate" hreflang="zh-CN" href="https://dev.lulabs.cn/zh/bootcamp" />
+    <xhtml:link rel="alternate" hreflang="en-US" href="https://dev.lulabs.cn/en/bootcamp" />
+  </url>
+  <url>
+    <loc>https://dev.lulabs.cn/en/bootcamp</loc>
+    <lastmod>2024-12-28</lastmod>
+    <changefreq>weekly</changefreq>
+    <priority>0.9</priority>
+    <xhtml:link rel="alternate" hreflang="zh-CN" href="https://dev.lulabs.cn/zh/bootcamp" />
+    <xhtml:link rel="alternate" hreflang="en-US" href="https://dev.lulabs.cn/en/bootcamp" />
+  </url>
+  <url>
+    <loc>https://dev.lulabs.cn/zh/about</loc>
+    <lastmod>2024-12-28</lastmod>
+    <changefreq>monthly</changefreq>
+    <priority>0.8</priority>
+    <xhtml:link rel="alternate" hreflang="zh-CN" href="https://dev.lulabs.cn/zh/about" />
+    <xhtml:link rel="alternate" hreflang="en-US" href="https://dev.lulabs.cn/en/about" />
+  </url>
+  <url>
+    <loc>https://dev.lulabs.cn/en/about</loc>
+    <lastmod>2024-12-28</lastmod>
+    <changefreq>monthly</changefreq>
+    <priority>0.8</priority>
+    <xhtml:link rel="alternate" hreflang="zh-CN" href="https://dev.lulabs.cn/zh/about" />
+    <xhtml:link rel="alternate" hreflang="en-US" href="https://dev.lulabs.cn/en/about" />
+  </url>
+</urlset>

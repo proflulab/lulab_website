@@ -1,0 +1,36 @@
+{
+  "name": "陆向谦实验室 - 创新时代的教育革新",
+  "short_name": "陆向谦实验室",
+  "description": "陆向谦实验室致力于培养具备全球视野与创新精神的复合型人才。通过项目式学习和创新教育，探索教育新范式。",
+  "start_url": "/",
+  "display": "standalone",
+  "background_color": "#ffffff",
+  "theme_color": "#ff9300",
+  "orientation": "portrait-primary",
+  "icons": [
+    {
+      "src": "/favicon.ico",
+      "sizes": "16x16 32x32",
+      "type": "image/x-icon"
+    },
+    {
+      "src": "/apple-touch-icon.png",
+      "sizes": "180x180",
+      "type": "image/png"
+    },
+    {
+      "src": "/android-chrome-192x192.png",
+      "sizes": "192x192",
+      "type": "image/png"
+    },
+    {
+      "src": "/android-chrome-512x512.png",
+      "sizes": "512x512",
+      "type": "image/png"
+    }
+  ],
+  "categories": ["education", "learning", "innovation"],
+  "lang": "zh-CN",
+  "scope": "/",
+  "prefer_related_applications": false
+}

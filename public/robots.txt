@@ -1,0 +1,22 @@
+User-agent: *
+Allow: /
+
+# Disallow admin and API routes
+Disallow: /api/
+Disallow: /admin/
+Disallow: /_next/
+Disallow: /static/
+
+# Allow important pages
+Allow: /zh/
+Allow: /en/
+Allow: /zh/bootcamp
+Allow: /en/bootcamp
+Allow: /zh/about
+Allow: /en/about
+
+# Sitemap location
+Sitemap: https://dev.lulabs.cn/sitemap.xml
+
+# Crawl delay (optional)
+Crawl-delay: 1

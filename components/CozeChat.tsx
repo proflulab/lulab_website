@@ -119,22 +119,34 @@ export default function CozeChat() {
             // 清理之前的实例
             cleanupCoze();
             
-            // 获取token和botId
-            let token = null;
-            let botId = null;
+            // 通过安全的代理API获取配置
+            let botId = '';
+            let sessionToken = '';
+            
             try {
-                const response = await fetch('/api/coze-token', { method: 'POST' });
+                const response = await fetch('/api/coze-proxy', {
+                    method: 'POST',
+                    headers: {
+                        'Content-Type': 'application/json',
+                    },
+                    body: JSON.stringify({
+                        action: 'getConfig'
+                    })
+                });
+                
                 if (response.ok) {
                     const data = await response.json();
-                    token = data.token;
-                    botId = data.botId;
+                    if (data.success) {
+                        botId = data.config.botId;
+                        sessionToken = data.config.sessionToken;
+                    }
                 }
             } catch (error) {
-                console.error('Failed to fetch Coze token and botId:', error);
+                console.error('Failed to get Coze config:', error);
                 return;
             }
-
-            if (!token || !botId || !isMounted) {
+            
+            if (!botId || !sessionToken || !isMounted) {
                 return;
             }
 
@@ -147,8 +159,29 @@ export default function CozeChat() {
                 },
                 auth: {
                     type: 'token',
-                    token: token,
-                    onRefreshToken: () => token,
+                    token: sessionToken,
+                    onRefreshToken: async () => {
+                        // 刷新token时重新获取
+                        try {
+                            const refreshResponse = await fetch('/api/coze-proxy', {
+                                method: 'POST',
+                                headers: {
+                                    'Content-Type': 'application/json',
+                                },
+                                body: JSON.stringify({
+                                    action: 'getConfig'
+                                })
+                            });
+                            
+                            if (refreshResponse.ok) {
+                                const refreshData = await refreshResponse.json();
+                                return refreshData.success ? refreshData.config.sessionToken : sessionToken;
+                            }
+                        } catch (error) {
+                            console.error('Failed to refresh token:', error);
+                        }
+                        return sessionToken;
+                    },
                     userInfo: {
                         id: '12345',
                         url: 'https://lf-coze-web-cdn.coze.cn/obj/coze-web-cn/obric/coze/favicon.1970.png',
@@ -180,7 +213,18 @@ export default function CozeChat() {
             };
 
             try {
-                instanceRef.current = new window.CozeWebSDK.WebChatClient(config);
+                // 修复类型不匹配问题，确保config对象符合WebChatClient的类型定义
+                instanceRef.current = new window.CozeWebSDK.WebChatClient({
+                    ...config,
+                    auth: {
+                        ...config.auth,
+                        // 将异步函数包装为同步返回，以符合类型定义
+                        onRefreshToken: () => {
+                            config.auth.onRefreshToken().then(token => token).catch(() => config.auth.token);
+                            return config.auth.token;
+                        }
+                    }
+                });
                 if (isMounted && cozeChatContainerRef.current) {
                     cozeChatContainerRef.current.style.display = 'block';
                 }

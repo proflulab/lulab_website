@@ -11,6 +11,8 @@ Before running the project, you need to create a ".env.local" file in the root d
 ```bash
 NEXT_PUBLIC_SUPABASE_URL=The URL of your supabase project
 NEXT_PUBLIC_SUPABASE_ANON_KEY=APIKEY of the supabase project
+COZE_TOKEN=Your Coze API token (server-side only, secure)
+COZE_BOT_ID=Your Coze bot ID (server-side only, secure)
 ```
 
 ```bash

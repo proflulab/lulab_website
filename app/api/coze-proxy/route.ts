@@ -19,12 +19,12 @@ export async function POST(request: NextRequest) {
         // 基本的安全验证
         const headersList = headers();
         const origin = headersList.get('origin');
-        const referer = headersList.get('referer');
         
         // 验证请求来源（可根据需要调整）
         const allowedOrigins = [
             'http://localhost:3000',
-            'https://yourdomain.com', // 替换为你的实际域名
+            'http://localhost:3001',
+            'https://www.lulabs.org', // 替换为你的实际域名
         ];
         
         if (origin && !allowedOrigins.includes(origin)) {

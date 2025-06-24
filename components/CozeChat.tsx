@@ -190,7 +190,7 @@ export default function CozeChat() {
                 },
                 ui: {
                     base: {
-                        icon: 'https://i.postimg.cc/909T36tF/Chat-GPT-Image-2025-6-14-09-45-06.png',
+                        icon: 'https://i.postimg.cc/44pXppff/extracted-circle.png',
                         layout: isMobile ? 'mobile' : 'pc',
                         zIndex: 1000,
                     },
@@ -201,8 +201,7 @@ export default function CozeChat() {
                         icon: 'https://tse3.mm.bing.net/th/id/OIP.CNkRqfGq0B6ONJkYDbCWmwAAAA?rs=1&pid=ImgDetMain',
                     },
                     chatBot: {
-                        title: t('botchat'),
-                        el: cozeChatContainerRef.current
+                        title: t('botchat')
                     }
                 },
                 userInfo: {
@@ -225,9 +224,6 @@ export default function CozeChat() {
                         }
                     }
                 });
-                if (isMounted && cozeChatContainerRef.current) {
-                    cozeChatContainerRef.current.style.display = 'block';
-                }
             } catch (error) {
                 console.error('Failed to initialize CozeWebSDK:', error);
             }
@@ -258,39 +254,9 @@ export default function CozeChat() {
         };
     }, [t, isMobile]); // 依赖翻译函数和屏幕尺寸，变化时重新初始化
 
-    // 获取响应式样式
-    const getResponsiveStyles = () => {
-        if (isMobile) {
-            return {
-                display: 'none',
-                width: 'calc(100vw - 20px)',
-                height: '70vh',
-                maxWidth: '400px',
-                position: 'fixed' as const,
-                bottom: '20px',
-                right: '10px',
-                zIndex: 1000,
-                borderRadius: '12px',
-                boxShadow: '0 4px 20px rgba(0, 0, 0, 0.15)',
-            };
-        } else {
-            return {
-                display: 'none',
-                width: '460px',
-                height: '80%',
-                position: 'fixed' as const,
-                bottom: '20px',
-                right: '20px',
-                zIndex: 1000,
-            };
-        }
-    };
+
 
     return (
-        <div
-            ref={cozeChatContainerRef}
-            id="coze-chat-container"
-            style={getResponsiveStyles()}
-        />
+        <div ref={cozeChatContainerRef} id="coze-chat-container" style={{display: 'none'}} />
     );
 }

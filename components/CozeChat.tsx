@@ -124,7 +124,13 @@ export default function CozeChat() {
             let sessionToken = '';
             
             try {
-                const response = await fetch('/api/coze-proxy', {
+                // 构建完整的API URL，支持Vercel部署
+                const baseUrl = process.env.NODE_ENV === 'production' 
+                    ? (typeof window !== 'undefined' ? window.location.origin : '')
+                    : '';
+                const apiUrl = `${baseUrl}/api/coze-proxy`;
+                
+                const response = await fetch(apiUrl, {
                     method: 'POST',
                     headers: {
                         'Content-Type': 'application/json',
@@ -139,7 +145,13 @@ export default function CozeChat() {
                     if (data.success) {
                         botId = data.config.botId;
                         sessionToken = data.config.sessionToken;
+                    } else {
+                        console.error('Coze config request failed:', data.error);
+                        return;
                     }
+                } else {
+                    console.error('Coze config request failed with status:', response.status);
+                    return;
                 }
             } catch (error) {
                 console.error('Failed to get Coze config:', error);
@@ -163,7 +175,12 @@ export default function CozeChat() {
                     onRefreshToken: async () => {
                         // 刷新token时重新获取
                         try {
-                            const refreshResponse = await fetch('/api/coze-proxy', {
+                            const baseUrl = process.env.NODE_ENV === 'production' 
+                                ? (typeof window !== 'undefined' ? window.location.origin : '')
+                                : '';
+                            const apiUrl = `${baseUrl}/api/coze-proxy`;
+                            
+                            const refreshResponse = await fetch(apiUrl, {
                                 method: 'POST',
                                 headers: {
                                     'Content-Type': 'application/json',

@@ -25,9 +25,18 @@ export async function POST(request: NextRequest) {
             'http://localhost:3000',
             'http://localhost:3001',
             'https://www.lulabs.org', // 替换为你的实际域名
-        ];
+            // Vercel部署域名支持
+            process.env.VERCEL_URL ? `https://${process.env.VERCEL_URL}` : null,
+            process.env.NEXT_PUBLIC_VERCEL_URL ? `https://${process.env.NEXT_PUBLIC_VERCEL_URL}` : null,
+            // 支持自定义域名环境变量
+            ...(process.env.ALLOWED_ORIGINS ? process.env.ALLOWED_ORIGINS.split(',') : []),
+        ].filter(Boolean);
         
-        if (origin && !allowedOrigins.includes(origin)) {
+        // 在开发环境中放宽CORS限制
+        if (process.env.NODE_ENV !== 'production' || !origin || allowedOrigins.includes(origin)) {
+            // 允许请求继续
+        } else {
+            console.warn(`Blocked request from unauthorized origin: ${origin}`);
             return NextResponse.json(
                 { error: 'Unauthorized origin' },
                 { status: 403 }
@@ -79,7 +88,14 @@ function generateSessionToken(originalToken: string): string {
     const sessionId = Math.random().toString(36).substring(2);
     
     // 简单的编码（实际应用中应使用更安全的方法）
-    return Buffer.from(`${sessionId}:${timestamp}:${originalToken}`).toString('base64');
+    // 注意：在生产环境中，建议使用JWT或其他更安全的token生成方式
+    try {
+        return Buffer.from(`${sessionId}:${timestamp}:${originalToken.substring(0, 10)}...`).toString('base64');
+    } catch (error) {
+        console.error('Token generation failed:', error);
+        // 返回一个基本的session token
+        return Buffer.from(`${sessionId}:${timestamp}:fallback`).toString('base64');
+    }
 }
 
 // 代理聊天请求到Coze API

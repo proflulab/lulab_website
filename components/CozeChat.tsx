@@ -119,20 +119,22 @@ export default function CozeChat() {
             // 清理之前的实例
             cleanupCoze();
             
-            // 获取token
+            // 获取token和用户信息
             let token = null;
+            let userInfo = null;
             try {
                 const response = await fetch('/api/coze-token', { method: 'POST' });
                 if (response.ok) {
                     const data = await response.json();
                     token = data.token;
+                    userInfo = data.userInfo;
                 }
             } catch (error) {
-                console.error('Failed to fetch Coze token:', error);
+                console.error('Failed to fetch Coze token and user info:', error);
                 return;
             }
 
-            if (!token || !isMounted) {
+            if (!token || !userInfo || !isMounted) {
                 return;
             }
 
@@ -150,7 +152,7 @@ export default function CozeChat() {
                 },
                 ui: {
                     base: {
-                        icon: 'https://i.postimg.cc/909T36tF/Chat-GPT-Image-2025-6-14-09-45-06.png',
+                        icon: 'https://i.postimg.cc/Zq0mk8TH/extracted-circle.png',
                         layout: isMobile ? 'mobile' : 'pc',
                         zIndex: 1000,
                     },
@@ -164,11 +166,7 @@ export default function CozeChat() {
                         title: t('botchat'),
                         el: cozeChatContainerRef.current
                     },
-                    userInfo: {
-                        id: '12345',
-                        url: 'https://lf-coze-web-cdn.coze.cn/obj/coze-web-cn/obric/coze/favicon.1970.png',
-                        nickname: 'UserA',
-                    }
+                    userInfo: userInfo
                 }
             };
 
@@ -177,10 +175,7 @@ export default function CozeChat() {
                     ...config,
                     ui: {
                         ...config.ui,
-                        userInfo: {
-                            ...config.ui.userInfo,
-                            id: '12345' as const // 将 id 类型固定为字面量类型 "12345"
-                        }
+                        userInfo: userInfo
                     }
                 });
                 if (isMounted && cozeChatContainerRef.current) {

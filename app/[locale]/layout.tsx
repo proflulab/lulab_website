@@ -16,15 +16,9 @@ import "./globals.css";
 import { Toaster } from "@/components/ui/toaster"
 
 export const metadata = {
-  title: {
-    default: '陆向谦实验室 - 创新时代的教育革新',
-    template: '%s | 陆向谦实验室'
-  },
-  description: '陆向谦实验室致力于培养具备全球视野与创新精神的复合型人才。通过项目式学习和创新教育，探索教育新范式：实践驱动、项目导向、精英聚合、协作共赢。',
-  keywords: ['陆向谦实验室', '创新教育', '项目式学习', '训练营', 'AI教育', '创业教育', '实践学习', '教育革新'],
-  authors: [{ name: '陆向谦实验室' }],
-  creator: '陆向谦实验室',
-  publisher: '陆向谦实验室',
+  keywords: ['陆向谦实验室', '创新教育', '项目式学习', '训练营', 'AI教育', '创业教育', '实践学习', '教育革新',"lu lab"],
+  creator: 'Lu Lab',
+  publisher: 'Lu Lab',
   formatDetection: {
     email: false,
     address: false,
@@ -40,13 +34,12 @@ export const metadata = {
   },
   openGraph: {
     url: 'https://dev.lulabs.cn',
-    siteName: '陆向谦实验室',
+    siteName: 'Lu Lab',
     images: [
       {
         url: 'https://th.bing.com/th/id/OIP.-bOs2je0XBIzmVk1251XtgHaHa?rs=1&pid=ImgDetMain',
         width: 1200,
         height: 630,
-        alt: '陆向谦实验室 - 创新教育平台',
       },
     ],
     locale: 'zh_CN',

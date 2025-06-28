@@ -30,7 +30,7 @@ export const metadata = {
     address: false,
     telephone: false,
   },
-  metadataBase: new URL('https://dev.lulabs.cn'),
+  metadataBase: new URL('https://www.lulabs.org/'),
   alternates: {
     canonical: '/',
     languages: {
@@ -39,8 +39,6 @@ export const metadata = {
     },
   },
   openGraph: {
-    title: '陆向谦实验室 - 创新时代的教育革新',
-    description: '陆向谦实验室致力于培养具备全球视野与创新精神的复合型人才。通过项目式学习和创新教育，探索教育新范式：实践驱动、项目导向、精英聚合、协作共赢。',
     url: 'https://dev.lulabs.cn',
     siteName: '陆向谦实验室',
     images: [
@@ -56,8 +54,6 @@ export const metadata = {
   },
   twitter: {
     card: 'summary_large_image',
-    title: '陆向谦实验室 - 创新时代的教育革新',
-    description: '陆向谦实验室致力于培养具备全球视野与创新精神的复合型人才。通过项目式学习和创新教育，探索教育新范式。',
     images: ['https://th.bing.com/th/id/OIP.-bOs2je0XBIzmVk1251XtgHaHa?rs=1&pid=ImgDetMain'],
   },
   robots: {
@@ -70,11 +66,6 @@ export const metadata = {
       'max-image-preview': 'large',
       'max-snippet': -1,
     },
-  },
-  verification: {
-    google: 'your-google-verification-code',
-    yandex: 'your-yandex-verification-code',
-    yahoo: 'your-yahoo-verification-code',
   },
 };
 

@@ -64,7 +64,15 @@ export const metadata = {
       'max-snippet': -1,
     },
   },
-  
+  verification: {
+
+google: 'your-google-verification-code',//我不知道
+
+yandex: 'your-yandex-verification-code',//我不知道
+
+yahoo: 'your-yahoo-verification-code',//我不知道
+
+},
 };
 
 export default async function RootLayout({

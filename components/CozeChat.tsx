@@ -16,10 +16,7 @@ declare global {
 const CozeChat = () => {
   const t = useTranslations('CozeChat');
   const cozeInstanceRef = useRef<any>(null);
-  const cozeChatContainerRef = useRef<HTMLDivElement>(null);
   const isMobile = typeof window !== 'undefined' && window.innerWidth <= 768;
-
-
 
   useEffect(() => {
     const loadCozeSDK = () => {
@@ -44,23 +41,7 @@ const CozeChat = () => {
     const initializeCoze = async () => {
       try {
         const sdk = await loadCozeSDK();
-        
         console.log('CozeWebSDK loaded:', sdk);
-        console.log('Available methods:', Object.keys(sdk as object));
-        
-        // 详细探索 WebChatClient 的结构
-        if ((sdk as any).WebChatClient) {
-          const webChatClient = (sdk as any).WebChatClient;
-          console.log('WebChatClient found:', webChatClient);
-          console.log('WebChatClient type:', typeof webChatClient);
-          console.log('WebChatClient methods:', Object.keys(webChatClient as object));
-          
-          // 如果是构造函数，尝试实例化
-          if (typeof webChatClient === 'function') {
-            console.log('WebChatClient is a constructor function');
-            console.log('WebChatClient prototype methods:', Object.getOwnPropertyNames(webChatClient.prototype));
-          }
-        }
         
         // 获取token
         const response = await fetch('/api/coze-token', {
@@ -87,17 +68,6 @@ const CozeChat = () => {
           config: {
             bot_id: process.env.NEXT_PUBLIC_COZE_BOT_ID || '7499463698092867610',
           },
-          componentProps: {
-            title: t('botchat'),
-            style: {
-              width: isMobile ? '100%' : '400px',
-              height: isMobile ? '100%' : '600px',
-              position: 'fixed',
-              bottom: '20px',
-              right: '20px',
-              zIndex: 9999,
-            },
-          },
           token,
           userInfo,
           ui: {
@@ -107,16 +77,15 @@ const CozeChat = () => {
               zIndex: 1000,
             },
             footer: {
-              isShow: false
+              isShow: false,
             },
             header: {
               icon: 'https://tse3.mm.bing.net/th/id/OIP.CNkRqfGq0B6ONJkYDbCWmwAAAA?rs=1&pid=ImgDetMain',
             },
             chatBot: {
-              title: t('AI'),
-               el: undefined,
-               width: 400,
-               height: '80%',
+              title: t('botchat'),
+              width: '20%',
+              height: '80%',
             },
             userInfo: userInfo
           }
@@ -129,26 +98,18 @@ const CozeChat = () => {
           const WebChatClient = window.CozeWebSDK.WebChatClient;
           
           if (typeof WebChatClient === 'function') {
-            // 尝试作为构造函数使用
-            console.log('Trying WebChatClient as constructor');
             try {
               cozeInstance = new WebChatClient(config);
               console.log('WebChatClient constructor succeeded');
             } catch (constructorError) {
-              console.log('Constructor failed:', constructorError);
-              
-              // 尝试直接调用
-              console.log('Trying WebChatClient as function');
+              console.log('Constructor failed, trying as function:', constructorError);
               cozeInstance = WebChatClient(config);
             }
           } else if (WebChatClient.init) {
-            console.log('Using WebChatClient.init');
             cozeInstance = await WebChatClient.init(config);
           } else if (WebChatClient.create) {
-            console.log('Using WebChatClient.create');
             cozeInstance = await WebChatClient.create(config);
           } else {
-            console.log('Available WebChatClient methods:', Object.keys(WebChatClient));
             throw new Error('No suitable initialization method found for WebChatClient');
           }
         } else {
@@ -157,7 +118,6 @@ const CozeChat = () => {
         
         cozeInstanceRef.current = cozeInstance;
         console.log('Coze chat initialized successfully:', cozeInstance);
-        
       } catch (error) {
         console.error('Failed to initialize Coze chat:', error);
       }
@@ -165,7 +125,6 @@ const CozeChat = () => {
 
     initializeCoze();
 
-    // 清理函数
     return () => {
       if (cozeInstanceRef.current && typeof cozeInstanceRef.current.destroy === 'function') {
         cozeInstanceRef.current.destroy();

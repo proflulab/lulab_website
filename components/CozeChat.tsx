@@ -1,249 +1,179 @@
-/*
- * @Author: 杨仕明 shiming.y@qq.com
- * @Date: 2025-05-03 10:18:36
- * @LastEditors: 杨仕明 shiming.y@qq.com
- * @LastEditTime: 2025-05-04 12:10:38
- * @FilePath: /lulab_website_next_js/components/CozeChat.tsx
- * @Description:
- *
- * Copyright (c) 2025 by ${git_name_email}, All Rights Reserved.
- */
 'use client';
 
-import { useEffect, useRef, useState } from 'react';
+import { useEffect, useRef } from 'react';
 import { useTranslations } from 'next-intl';
 
+interface CozeWebSDK {
+  WebChatClient: any;
+}
+
 declare global {
-    interface Window {
-        CozeWebSDK: {
-            WebChatClient: new (config: {
-                config: {
-                    bot_id: string;
-                };
-                componentProps: {
-                    title: string;
-                };
-                auth: {
-                    type: string;
-                    token: string;
-                    onRefreshToken: () => string;
-                };
-                ui: {
-                    base: {
-                        icon: string;
-                        layout: string;
-                        zIndex: number;
-                    };
-                    footer: {
-                        isShow: boolean;
-                    };
-                    header: {
-                        icon: string;
-                    };
-                    chatBot: {
-                        title: string;
-                        el?: HTMLElement;
-                    };
-                    userInfo: {
-                        id: string;
-                        url: string;
-                        nickname: string;
-                    };
-                };
-            }) => CozeWebChatInstance;
+  interface Window {
+    CozeWebSDK: CozeWebSDK;
+  }
+}
+
+const CozeChat = () => {
+  const t = useTranslations('CozeChat');
+  const cozeInstanceRef = useRef<any>(null);
+  const cozeChatContainerRef = useRef<HTMLDivElement>(null);
+  const isMobile = typeof window !== 'undefined' && window.innerWidth <= 768;
+
+
+
+  useEffect(() => {
+    const loadCozeSDK = () => {
+      return new Promise((resolve, reject) => {
+        if (window.CozeWebSDK) {
+          resolve(window.CozeWebSDK);
+          return;
+        }
+
+        const script = document.createElement('script');
+        script.src = 'https://sf-cdn.coze.com/obj/unpkg-va/flow-platform/chat-app-sdk/1.0.0-beta.4/libs/oversea/index.js';
+        script.onload = () => {
+          setTimeout(() => {
+            resolve(window.CozeWebSDK);
+          }, 100);
         };
-    }
-}
+        script.onerror = reject;
+        document.head.appendChild(script);
+      });
+    };
 
-// 添加 CozeWebChatInstance 接口定义
-interface CozeWebChatInstance {
-    destroy?: () => void;
-    // 可以根据需要添加其他方法
-}
-
-export default function CozeChat() {
-    const t = useTranslations('CozeChat');
-    const cozeChatContainerRef = useRef<HTMLDivElement>(null);
-    const instanceRef = useRef<CozeWebChatInstance | null>(null);
-    const [isMobile, setIsMobile] = useState(false);
-
-    const cleanupCoze = () => {
-        // 清理现有实例
-        if (instanceRef.current) {
-            if (typeof instanceRef.current.destroy === 'function') {
-                instanceRef.current.destroy();
-            }
-            instanceRef.current = null;
+    const initializeCoze = async () => {
+      try {
+        const sdk = await loadCozeSDK();
+        
+        console.log('CozeWebSDK loaded:', sdk);
+        console.log('Available methods:', Object.keys(sdk as object));
+        
+        // 详细探索 WebChatClient 的结构
+        if ((sdk as any).WebChatClient) {
+          const webChatClient = (sdk as any).WebChatClient;
+          console.log('WebChatClient found:', webChatClient);
+          console.log('WebChatClient type:', typeof webChatClient);
+          console.log('WebChatClient methods:', Object.keys(webChatClient as object));
+          
+          // 如果是构造函数，尝试实例化
+          if (typeof webChatClient === 'function') {
+            console.log('WebChatClient is a constructor function');
+            console.log('WebChatClient prototype methods:', Object.getOwnPropertyNames(webChatClient.prototype));
+          }
         }
         
-        // 清理DOM元素
-        const selectors = [
-            '[id*="coze"]:not(#coze-chat-container)',
-            '[class*="coze"]',
-            '[class*="chat-widget"]',
-            'iframe[src*="coze"]'
-        ];
-        
-        selectors.forEach(selector => {
-            document.querySelectorAll(selector).forEach(el => {
-                el.remove();
-            });
+        // 获取token
+        const response = await fetch('/api/coze-token', {
+          method: 'POST',
+          headers: {
+            'Content-Type': 'application/json',
+          },
         });
-    };
-
-    useEffect(() => {
-        // 检测屏幕尺寸
-        const checkScreenSize = () => {
-            setIsMobile(window.innerWidth <= 768);
-        };
         
-        // 初始检测
-        checkScreenSize();
-        
-        // 添加窗口大小变化监听器
-        window.addEventListener('resize', checkScreenSize);
-        
-        return () => {
-            window.removeEventListener('resize', checkScreenSize);
-        };
-    }, []);
-
-    useEffect(() => {
-        let isMounted = true;
-        
-        const initCozeChat = async () => {
-            if (!cozeChatContainerRef.current || !window.CozeWebSDK) {
-                return;
-            }
-
-            // 清理之前的实例
-            cleanupCoze();
-            
-            // 获取token和用户信息
-            let token = null;
-            let userInfo = null;
-            try {
-                const response = await fetch('/api/coze-token', { method: 'POST' });
-                if (response.ok) {
-                    const data = await response.json();
-                    token = data.token;
-                    userInfo = data.userInfo;
-                }
-            } catch (error) {
-                console.error('Failed to fetch Coze token and user info:', error);
-                return;
-            }
-
-            if (!token || !userInfo || !isMounted) {
-                return;
-            }
-
-            const config = {
-                config: {
-                    bot_id: process.env.NEXT_PUBLIC_COZE_BOT_ID || '',
-                },
-                componentProps: {
-                    title: t('botchat')
-                },
-                auth: {
-                    type: 'token',
-                    token: token,
-                    onRefreshToken: () => token
-                },
-                ui: {
-                    base: {
-                        icon: 'https://i.postimg.cc/Zq0mk8TH/extracted-circle.png',
-                        layout: isMobile ? 'mobile' : 'pc',
-                        zIndex: 1000,
-                    },
-                    footer: {
-                        isShow: false
-                    },
-                    header: {
-                        icon: 'https://tse3.mm.bing.net/th/id/OIP.CNkRqfGq0B6ONJkYDbCWmwAAAA?rs=1&pid=ImgDetMain',
-                    },
-                    chatBot: {
-                        title: t('botchat'),
-                        el: cozeChatContainerRef.current
-                    },
-                    userInfo: userInfo
-                }
-            };
-
-            try {
-                instanceRef.current = new window.CozeWebSDK.WebChatClient({
-                    ...config,
-                    ui: {
-                        ...config.ui,
-                        userInfo: userInfo
-                    }
-                });
-                if (isMounted && cozeChatContainerRef.current) {
-                    cozeChatContainerRef.current.style.display = 'block';
-                }
-            } catch (error) {
-                console.error('Failed to initialize CozeWebSDK:', error);
-            }
-        };
-
-        const loadSDKAndInit = () => {
-            const sdkScriptId = 'coze-web-sdk-script';
-            if (!document.getElementById(sdkScriptId)) {
-                const script = document.createElement('script');
-                script.src = 'https://lf-cdn.coze.cn/obj/unpkg/flow-platform/chat-app-sdk/1.2.0-beta.6/libs/cn/index.js';
-                script.async = true;
-                script.id = sdkScriptId;
-                script.onload = initCozeChat;
-                script.onerror = () => {
-                    console.error('Failed to load Coze Web SDK script.');
-                };
-                document.body.appendChild(script);
-            } else if (window.CozeWebSDK) {
-                initCozeChat();
-            }
-        };
-
-        loadSDKAndInit();
-
-        return () => {
-            isMounted = false;
-            cleanupCoze();
-        };
-    }, [t, isMobile]); // 依赖翻译函数和屏幕尺寸，变化时重新初始化
-
-    // 获取响应式样式
-    const getResponsiveStyles = () => {
-        if (isMobile) {
-            return {
-                display: 'none',
-                width: 'calc(100vw - 20px)',
-                height: '70vh',
-                maxWidth: '400px',
-                position: 'fixed' as const,
-                bottom: '20px',
-                right: '10px',
-                zIndex: 1000,
-                borderRadius: '12px',
-                boxShadow: '0 4px 20px rgba(0, 0, 0, 0.15)',
-            };
-        } else {
-            return {
-                display: 'none',
-                width: '460px',
-                height: '80%',
-                position: 'fixed' as const,
-                bottom: '20px',
-                right: '20px',
-                zIndex: 1000,
-            };
+        if (!response.ok) {
+          throw new Error('Failed to get token');
         }
+        
+        const { token } = await response.json();
+        
+        // 定义用户信息
+        const userInfo = {
+          id: 'LuLab',
+          url: 'https://lf-coze-web-cdn.coze.cn/obj/coze-web-cn/obric/coze/favicon.1970.png',
+          nickname: 'UserA',
+        };
+        
+        const config = {
+          config: {
+            bot_id: process.env.NEXT_PUBLIC_COZE_BOT_ID || '7499463698092867610',
+          },
+          componentProps: {
+            title: t('botchat'),
+            style: {
+              width: isMobile ? '100%' : '400px',
+              height: isMobile ? '100%' : '600px',
+              position: 'fixed',
+              bottom: '20px',
+              right: '20px',
+              zIndex: 9999,
+            },
+          },
+          token,
+          userInfo,
+          ui: {
+            base: {
+              icon: 'https://i.postimg.cc/Zq0mk8TH/extracted-circle.png',
+              layout: isMobile ? 'mobile' : 'pc',
+              zIndex: 1000,
+            },
+            footer: {
+              isShow: false
+            },
+            header: {
+              icon: 'https://tse3.mm.bing.net/th/id/OIP.CNkRqfGq0B6ONJkYDbCWmwAAAA?rs=1&pid=ImgDetMain',
+            },
+            chatBot: {
+              title: t('AI'),
+               el: undefined,
+               width: 400,
+               height: '80%',
+            },
+            userInfo: userInfo
+          }
+        };
+
+        let cozeInstance;
+        
+        // 尝试不同的初始化方式
+        if (window.CozeWebSDK?.WebChatClient) {
+          const WebChatClient = window.CozeWebSDK.WebChatClient;
+          
+          if (typeof WebChatClient === 'function') {
+            // 尝试作为构造函数使用
+            console.log('Trying WebChatClient as constructor');
+            try {
+              cozeInstance = new WebChatClient(config);
+              console.log('WebChatClient constructor succeeded');
+            } catch (constructorError) {
+              console.log('Constructor failed:', constructorError);
+              
+              // 尝试直接调用
+              console.log('Trying WebChatClient as function');
+              cozeInstance = WebChatClient(config);
+            }
+          } else if (WebChatClient.init) {
+            console.log('Using WebChatClient.init');
+            cozeInstance = await WebChatClient.init(config);
+          } else if (WebChatClient.create) {
+            console.log('Using WebChatClient.create');
+            cozeInstance = await WebChatClient.create(config);
+          } else {
+            console.log('Available WebChatClient methods:', Object.keys(WebChatClient));
+            throw new Error('No suitable initialization method found for WebChatClient');
+          }
+        } else {
+          throw new Error('WebChatClient not found in CozeWebSDK');
+        }
+        
+        cozeInstanceRef.current = cozeInstance;
+        console.log('Coze chat initialized successfully:', cozeInstance);
+        
+      } catch (error) {
+        console.error('Failed to initialize Coze chat:', error);
+      }
     };
 
-    return (
-        <div
-            ref={cozeChatContainerRef}
-            id="coze-chat-container"
-            style={getResponsiveStyles()}
-        />
-    );
-}
+    initializeCoze();
+
+    // 清理函数
+    return () => {
+      if (cozeInstanceRef.current && typeof cozeInstanceRef.current.destroy === 'function') {
+        cozeInstanceRef.current.destroy();
+      }
+    };
+  }, [t, isMobile]);
+
+  return null;
+};
+
+export default CozeChat;

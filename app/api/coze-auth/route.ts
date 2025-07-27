@@ -20,6 +20,12 @@ export async function GET(request: Request) {
     const codeVerifier = generateCodeVerifier();
     const codeChallenge = generateCodeChallenge(codeVerifier);
 
+    console.log('Starting OAuth flow:', {
+      state: state,
+      clientId: process.env.COZE_CLIENT_ID,
+      redirectUri: process.env.COZE_REDIRECT_URI
+    });
+
     const authUrl = `https://api.coze.cn/api/permission/oauth2/authorize?` +
       `client_id=${encodeURIComponent(process.env.COZE_CLIENT_ID!)}&` +
       `redirect_uri=${encodeURIComponent(process.env.COZE_REDIRECT_URI!)}&` +
@@ -28,25 +34,53 @@ export async function GET(request: Request) {
       `code_challenge=${encodeURIComponent(codeChallenge)}&` +
       `code_challenge_method=S256`;
 
-    cookies().set('coze_code_verifier', codeVerifier, { 
+    const cookieOptions = {
       httpOnly: true, 
       secure: process.env.NODE_ENV === 'production',
-      sameSite: 'lax'
-    });
-    cookies().set('coze_state', state, { 
-      httpOnly: true, 
-      secure: process.env.NODE_ENV === 'production',
-      sameSite: 'lax'
-    });
+      sameSite: 'lax' as const,
+      maxAge: 10 * 60 // 10 minutes for temporary cookies
+    };
+
+    cookies().set('coze_code_verifier', codeVerifier, cookieOptions);
+    cookies().set('coze_state', state, cookieOptions);
 
     return NextResponse.redirect(authUrl);
   } else if (code) {
     // Callback - only process if we have a code parameter
     const state = searchParams.get('state');
     const storedState = cookies().get('coze_state')?.value;
+    
+    console.log('Processing OAuth callback:', {
+      hasCode: !!code,
+      receivedState: state,
+      storedState: storedState,
+      allParams: Object.fromEntries(searchParams.entries())
+    });
 
-    if (!code || state !== storedState) {
-      return NextResponse.json({ error: 'Invalid state or code' }, { status: 400 });
+    // Validate state parameter
+    if (!state || !storedState || state !== storedState) {
+      console.error('State validation failed:', {
+        receivedState: state,
+        storedState: storedState,
+        stateMatch: state === storedState
+      });
+      
+      // Clear temporary cookies
+      cookies().delete('coze_code_verifier');
+      cookies().delete('coze_state');
+      
+      return NextResponse.redirect('/?error=invalid_state');
+    }
+    
+    // Validate code parameter
+    if (!code) {
+      console.error('Missing authorization code');
+      
+      // Clear temporary cookies
+      cookies().delete('coze_code_verifier');
+      cookies().delete('coze_state');
+      
+      return NextResponse.redirect('/?error=missing_code');
     }
 
     const verifier = cookies().get('coze_code_verifier')?.value;

@@ -14,6 +14,12 @@ export async function POST() {
       }, { status: 401 });
     }
 
+    console.log('Refresh token endpoint called:', {
+      hasRefreshToken: !!refreshToken,
+      clientId: process.env.COZE_CLIENT_ID,
+      hasClientSecret: !!(process.env.COZE_CLIENT_SECRET && process.env.COZE_CLIENT_SECRET.trim())
+    });
+
     // 准备刷新token请求
     const tokenRequestBody = new URLSearchParams({
       grant_type: 'refresh_token',
@@ -21,7 +27,8 @@ export async function POST() {
       refresh_token: refreshToken,
     });
 
-    if (process.env.COZE_CLIENT_SECRET) {
+    // 只有在客户端密钥存在且不为空时才添加
+    if (process.env.COZE_CLIENT_SECRET && process.env.COZE_CLIENT_SECRET.trim()) {
       tokenRequestBody.append('client_secret', process.env.COZE_CLIENT_SECRET);
     }
 

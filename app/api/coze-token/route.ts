@@ -10,21 +10,40 @@ async function refreshAccessToken(refreshToken: string) {
       refresh_token: refreshToken,
     });
 
-    if (process.env.COZE_CLIENT_SECRET) {
+    // 只有在客户端密钥存在且不为空时才添加
+    if (process.env.COZE_CLIENT_SECRET && process.env.COZE_CLIENT_SECRET.trim()) {
       tokenRequestBody.append('client_secret', process.env.COZE_CLIENT_SECRET);
     }
 
+    console.log('Refreshing token with params:', {
+      grant_type: 'refresh_token',
+      client_id: process.env.COZE_CLIENT_ID,
+      has_client_secret: !!(process.env.COZE_CLIENT_SECRET && process.env.COZE_CLIENT_SECRET.trim()),
+      refresh_token_length: refreshToken.length
+    });
+
     const response = await fetch('https://api.coze.cn/api/permission/oauth2/token', {
       method: 'POST',
-      headers: { 'Content-Type': 'application/x-www-form-urlencoded' },
+      headers: { 
+        'Content-Type': 'application/x-www-form-urlencoded',
+        'Accept': 'application/json'
+      },
       body: tokenRequestBody.toString(),
     });
 
     if (!response.ok) {
-      throw new Error(`Token refresh failed: ${response.status}`);
+      const errorText = await response.text();
+      console.error('Token refresh failed:', {
+        status: response.status,
+        statusText: response.statusText,
+        error: errorText
+      });
+      throw new Error(`Token refresh failed: ${response.status} - ${errorText}`);
     }
 
-    return await response.json();
+    const result = await response.json();
+    console.log('Token refresh successful');
+    return result;
   } catch (error) {
     console.error('Token refresh error:', error);
     return null;
@@ -49,6 +68,14 @@ export async function POST() {
     let accessToken = cookies().get('coze_access_token')?.value;
     const refreshToken = cookies().get('coze_refresh_token')?.value;
     const userInfoStr = cookies().get('coze_user_info')?.value;
+    
+    console.log('Token API called:', {
+      hasAccessToken: !!accessToken,
+      hasRefreshToken: !!refreshToken,
+      hasUserInfo: !!userInfoStr,
+      clientId: process.env.COZE_CLIENT_ID,
+      redirectUri: process.env.COZE_REDIRECT_URI
+    });
 
     // 检查是否有基本的认证信息
     if (!accessToken && !refreshToken) {
@@ -60,8 +87,12 @@ export async function POST() {
 
     // 如果有访问令牌，验证其有效性
     if (accessToken) {
+      console.log('Validating access token...');
       const isValid = await validateAccessToken(accessToken);
+      console.log('Access token validation result:', isValid);
+      
       if (!isValid && refreshToken) {
+        console.log('Access token invalid, attempting refresh...');
         // 访问令牌无效，尝试刷新
         const tokenData = await refreshAccessToken(refreshToken);
         if (tokenData && tokenData.access_token) {

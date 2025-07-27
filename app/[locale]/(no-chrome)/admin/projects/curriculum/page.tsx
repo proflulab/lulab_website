@@ -21,7 +21,7 @@ import { Curriculum } from '@/types';
 
 export default function CurriculumPage() {
     const searchParams = useSearchParams();
-    const projectId = searchParams.get('projectId');
+    const projectId = searchParams?.get('projectId');
     const [curriculums, setCurriculums] = useState<Curriculum[]>([]);
     const [loading, setLoading] = useState(true);
     const [error, setError] = useState<string | null>(null);

@@ -5,17 +5,17 @@ import "@coze/chat-sdk/webCss";
 import ChatSdk from "@coze/chat-sdk/webJs";
 const { ChatFramework, ChatSlot, ChatType, Language } = ChatSdk;
 
-type CozeChatClientProps = {
-  token: string;
-  userInfo: any;
-  isMobile: boolean;
-  t: (key: string) => string;
+type UserInfo = {
+  id: string;
+  url: string;
+  nickname: string;
 };
 
-type TokenRefreshResult = {
-  success: boolean;
-  token?: string;
-  error?: string;
+type CozeChatClientProps = {
+  token: string;
+  userInfo: UserInfo;
+  isMobile: boolean;
+  t: (key: string) => string;
 };
 
 export default function CozeChatClient({ token, userInfo, isMobile, t }: CozeChatClientProps) {
@@ -27,7 +27,7 @@ export default function CozeChatClient({ token, userInfo, isMobile, t }: CozeCha
   const refreshToken = useCallback(async (): Promise<string> => {
     if (isRefreshing) {
       // 如果正在刷新，等待当前刷新完成
-      return new Promise((resolve, reject) => {
+      return new Promise((resolve) => {
         const checkRefresh = () => {
           if (!isRefreshing) {
             resolve(currentToken);
@@ -73,19 +73,6 @@ export default function CozeChatClient({ token, userInfo, isMobile, t }: CozeCha
     }
   }, [currentToken, isRefreshing]);
 
-  const getResponsiveStyles = () => ({
-    display: 'block',
-    width: isMobile ? 'calc(100vw - 20px)' : '460px',
-    height: isMobile ? '70vh' : '80%',
-    maxWidth: isMobile ? '400px' : undefined,
-    position: 'fixed',
-    bottom: '20px',
-    right: isMobile ? '10px' : '20px',
-    zIndex: 1000,
-    borderRadius: isMobile ? '12px' : undefined,
-    boxShadow: isMobile ? '0 4px 20px rgba(0, 0, 0, 0.15)' : undefined,
-  });
-
   return (
     <div
       ref={cozeChatContainerRef}
@@ -116,7 +103,11 @@ export default function CozeChatClient({ token, userInfo, isMobile, t }: CozeCha
           token: currentToken, 
           onRefreshToken: refreshToken 
         }}
-        user={userInfo}
+        user={{
+          id: userInfo.id,
+          name: userInfo.nickname,
+          avatar: userInfo.url
+        }}
         ui={{
           layout: isMobile ? 'mobile' : 'pc',
           footer: { isNeed: false },

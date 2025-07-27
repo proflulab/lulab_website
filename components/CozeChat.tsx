@@ -10,7 +10,11 @@ export default function CozeChat() {
   const t = useTranslations('CozeChat');
   const [isMobile, setIsMobile] = useState(false);
   const [token, setToken] = useState<string | null>(null);
-  const [userInfo, setUserInfo] = useState<any | null>(null);
+  const [userInfo, setUserInfo] = useState<{
+    id: string;
+    url: string;
+    nickname: string;
+  } | null>(null);
   const [isLoading, setIsLoading] = useState(true);
   const [isAuthenticating, setIsAuthenticating] = useState(false);
 

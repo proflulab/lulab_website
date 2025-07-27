@@ -18,7 +18,7 @@ export default function Login() {
   const [isLoading, setIsLoading] = useState(false);
   const router = useRouter();
   const searchParams = useSearchParams();
-  const callbackUrl = searchParams.get('callbackUrl') || '/admin';
+  const callbackUrl = searchParams?.get('callbackUrl') || '/admin';
 
   async function onSubmit(event: FormEvent<HTMLFormElement>) {
     event.preventDefault();

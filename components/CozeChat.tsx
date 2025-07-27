@@ -3,6 +3,7 @@
 import { useEffect, useState } from 'react';
 import { useTranslations } from 'next-intl';
 import dynamic from 'next/dynamic';
+import { useSearchParams } from 'next/navigation';
 
 const CozeChatClient = dynamic(() => import('./CozeChatClient'), { ssr: false });
 
@@ -17,6 +18,8 @@ export default function CozeChat() {
   } | null>(null);
   const [isLoading, setIsLoading] = useState(true);
   const [isAuthenticating, setIsAuthenticating] = useState(false);
+  const [authError, setAuthError] = useState<string | null>(null);
+  const searchParams = useSearchParams();
 
   useEffect(() => {
     const checkScreenSize = () => {
@@ -47,7 +50,14 @@ export default function CozeChat() {
         const data = await response.json();
         
         if (data.needsAuth) {
-          console.log('Authentication required, redirecting to OAuth...');
+          console.log('Authentication required, checking if post-auth...');
+          if (searchParams?.get('auth') === 'success') {
+            console.error('Authentication failed even after OAuth redirect');
+            setAuthError('认证失败，请重试或联系支持。');
+            setIsLoading(false);
+            return;
+          }
+          console.log('Redirecting to OAuth...');
           setIsAuthenticating(true);
           window.location.href = '/api/coze-auth?action=start';
           return;
@@ -105,6 +115,10 @@ export default function CozeChat() {
     
     fetchData();
   }, [isAuthenticating]);
+
+  if (authError) {
+    return <div>{authError}</div>;
+  }
 
   if (isLoading || isAuthenticating) {
     return null; // 或者显示加载指示器

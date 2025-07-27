@@ -69,7 +69,8 @@ export async function GET(request: Request) {
       cookies().delete('coze_code_verifier');
       cookies().delete('coze_state');
       
-      return NextResponse.redirect('/?error=invalid_state');
+      const redirectUrl = new URL('/?error=invalid_state', request.url);
+      return NextResponse.redirect(redirectUrl);
     }
     
     // Validate code parameter
@@ -80,7 +81,8 @@ export async function GET(request: Request) {
       cookies().delete('coze_code_verifier');
       cookies().delete('coze_state');
       
-      return NextResponse.redirect('/?error=missing_code');
+      const redirectUrl = new URL('/?error=missing_code', request.url);
+      return NextResponse.redirect(redirectUrl);
     }
 
     const verifier = cookies().get('coze_code_verifier')?.value;
@@ -129,7 +131,8 @@ export async function GET(request: Request) {
         cookies().delete('coze_code_verifier');
         cookies().delete('coze_state');
         
-        return NextResponse.redirect(`/?error=token_exchange_failed&details=${encodeURIComponent(errorText)}`);
+        const redirectUrl = new URL(`/?error=token_exchange_failed&details=${encodeURIComponent(errorText)}`, request.url);
+        return NextResponse.redirect(redirectUrl);
       }
 
       const tokenData = await tokenResponse.json();
@@ -139,7 +142,8 @@ export async function GET(request: Request) {
         console.error('Invalid token response: missing access_token', tokenData);
         cookies().delete('coze_code_verifier');
         cookies().delete('coze_state');
-        return NextResponse.redirect('/?error=invalid_token_response');
+        const redirectUrl = new URL('/?error=invalid_token_response', request.url);
+        return NextResponse.redirect(redirectUrl);
       }
 
       // 获取用户信息
@@ -162,7 +166,8 @@ export async function GET(request: Request) {
         cookies().delete('coze_code_verifier');
         cookies().delete('coze_state');
         
-        return NextResponse.redirect(`/?error=user_info_failed&details=${encodeURIComponent(errorText)}`);
+        const redirectUrl = new URL(`/?error=user_info_failed&details=${encodeURIComponent(errorText)}`, request.url);
+        return NextResponse.redirect(redirectUrl);
       }
 
       const user = await userResponse.json();
@@ -172,8 +177,15 @@ export async function GET(request: Request) {
         console.error('Invalid user response: missing user_id', user);
         cookies().delete('coze_code_verifier');
         cookies().delete('coze_state');
-        return NextResponse.redirect('/?error=invalid_user_data');
+        const redirectUrl = new URL('/?error=invalid_user_data', request.url);
+        return NextResponse.redirect(redirectUrl);
       }
+
+      // 只存储必需的用户信息以减少 cookie 大小
+      const essentialUserInfo = {
+        user_id: user.user_id,
+        // 如果需要其他字段，可以添加，但保持最小化
+      };
 
       // 设置cookies，包含过期时间
       const cookieOptions = {
@@ -183,7 +195,7 @@ export async function GET(request: Request) {
       };
 
       // 设置用户信息cookie（24小时过期）
-      cookies().set('coze_user_info', JSON.stringify(user), {
+      cookies().set('coze_user_info', JSON.stringify(essentialUserInfo), {
         ...cookieOptions,
         maxAge: 24 * 60 * 60 // 24小时
       });
@@ -207,7 +219,8 @@ export async function GET(request: Request) {
       cookies().delete('coze_state');
 
       // 重定向到首页，带上成功标识
-      return NextResponse.redirect('/?auth=success');
+      const redirectUrl = new URL('/?auth=success', request.url);
+      return NextResponse.redirect(redirectUrl);
       
     } catch (error) {
       console.error('OAuth callback error:', error);
@@ -216,7 +229,8 @@ export async function GET(request: Request) {
       cookies().delete('coze_code_verifier');
       cookies().delete('coze_state');
       
-      return NextResponse.redirect('/?error=oauth_callback_failed');
+      const redirectUrl = new URL('/?error=oauth_callback_failed', request.url);
+      return NextResponse.redirect(redirectUrl);
     }
   } else {
     // Invalid request - neither start action nor callback code

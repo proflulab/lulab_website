@@ -98,10 +98,8 @@ export async function GET(request: Request) {
         code_verifier: verifier,
       });
 
-      // 如果有客户端密钥，添加到请求中
-      if (process.env.COZE_CLIENT_SECRET) {
-        tokenRequestBody.append('client_secret', process.env.COZE_CLIENT_SECRET);
-      }
+      // 移动端/PC桌面端/单页面应用不使用客户端密钥
+      // 使用PKCE流程确保安全性
 
       // 发送token交换请求
       const tokenResponse = await fetch('https://api.coze.cn/api/permission/oauth2/token', {

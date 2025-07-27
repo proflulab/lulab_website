@@ -17,7 +17,7 @@ export async function POST() {
     console.log('Refresh token endpoint called:', {
       hasRefreshToken: !!refreshToken,
       clientId: process.env.COZE_CLIENT_ID,
-      hasClientSecret: !!(process.env.COZE_CLIENT_SECRET && process.env.COZE_CLIENT_SECRET.trim())
+      usingPKCE: true // 移动端/PC桌面端/单页面应用使用PKCE流程
     });
 
     // 准备刷新token请求
@@ -27,10 +27,8 @@ export async function POST() {
       refresh_token: refreshToken,
     });
 
-    // 只有在客户端密钥存在且不为空时才添加
-    if (process.env.COZE_CLIENT_SECRET && process.env.COZE_CLIENT_SECRET.trim()) {
-      tokenRequestBody.append('client_secret', process.env.COZE_CLIENT_SECRET);
-    }
+    // 移动端/PC桌面端/单页面应用不使用客户端密钥
+    // 刷新令牌时依然使用PKCE流程
 
     const response = await fetch('https://api.coze.cn/api/permission/oauth2/token', {
       method: 'POST',

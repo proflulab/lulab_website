@@ -10,15 +10,13 @@ async function refreshAccessToken(refreshToken: string) {
       refresh_token: refreshToken,
     });
 
-    // 只有在客户端密钥存在且不为空时才添加
-    if (process.env.COZE_CLIENT_SECRET && process.env.COZE_CLIENT_SECRET.trim()) {
-      tokenRequestBody.append('client_secret', process.env.COZE_CLIENT_SECRET);
-    }
+    // 移动端/PC桌面端/单页面应用不使用客户端密钥
+    // 使用PKCE流程确保安全性
 
     console.log('Refreshing token with params:', {
       grant_type: 'refresh_token',
       client_id: process.env.COZE_CLIENT_ID,
-      has_client_secret: !!(process.env.COZE_CLIENT_SECRET && process.env.COZE_CLIENT_SECRET.trim()),
+      using_pkce: true, // 移动端/PC桌面端/单页面应用使用PKCE流程
       refresh_token_length: refreshToken.length
     });
 

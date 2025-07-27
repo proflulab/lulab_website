@@ -9,13 +9,12 @@
  * Copyright (c) 2025 by ${git_name_email}, All Rights Reserved. 
  */
 
-import { AuthOptions } from 'next-auth';
-import CredentialsProvider from 'next-auth/providers/credentials';
-// import Credentials from "next-auth/providers/credentials"
+import NextAuth from 'next-auth';
+import Credentials from 'next-auth/providers/credentials';
 
-const auth: AuthOptions = {
+export const { handlers, signIn, signOut, auth } = NextAuth({
   providers: [
-    CredentialsProvider({
+    Credentials({
       name: 'Credentials',
       credentials: {
         username: { type: 'text' },
@@ -33,6 +32,4 @@ const auth: AuthOptions = {
       }
     })
   ]
-};
-
-export default auth;
+});

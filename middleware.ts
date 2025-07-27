@@ -9,10 +9,10 @@
  * Copyright (c) 2024 by ${git_name_email}, All Rights Reserved. 
  */
 
-import { NextRequest } from 'next/server';
-import { withAuth } from 'next-auth/middleware';
+import { NextRequest, NextResponse } from 'next/server';
 import createMiddleware from 'next-intl/middleware';
 import { routing } from './i18n/routing';
+import { auth } from './auth';
 
 // 定义公开页面
 const publicPages = [
@@ -31,52 +31,40 @@ const pagesWithSubpaths = [
 
 const intlMiddleware = createMiddleware(routing);
 
-// 创建认证中间件
-const authMiddleware = withAuth(
-    // Note that this callback is only invoked if
-    // the `authorized` callback has returned `true`
-    // and not for pages listed in `pages`.
-    (req) => intlMiddleware(req),
-    {
-        callbacks: {
-            authorized: ({ token }) => token != null
-        },
-        pages: {
-            signIn: '/login'
-        }
-    }
-);
+export default auth((req) => {
+  const publicPathnameRegex = RegExp(
+    `^(/(${routing.locales.join('|')}))?(${publicPages
+      .flatMap((p) => (p === '/' ? ['', '/'] : p))
+      .join('|')})/?$`,
+    'i'
+  );
 
-export default function middleware(req: NextRequest) {
-    const publicPathnameRegex = RegExp(
-        `^(/(${routing.locales.join('|')}))?(${publicPages
-            .flatMap((p) => (p === '/' ? ['', '/'] : p))
-            .join('|')})/?$`,
-        'i'
-    );
+  const subpathRegex = RegExp(
+    `^(/(${routing.locales.join('|')}))?(${pagesWithSubpaths
+      .join('|')})/.+$`,
+    'i'
+  );
 
-    // 检查是否为公开页面的子路径
-    const subpathRegex = RegExp(
-        `^(/(${routing.locales.join('|')}))?(${pagesWithSubpaths
-            .join('|')})/.+$`,
-        'i'
-    );
+  const isPublicPage = publicPathnameRegex.test(req.nextUrl.pathname);
+  const isAllowedSubpath = pagesWithSubpaths.length > 0 && subpathRegex.test(req.nextUrl.pathname);
 
-    const isPublicPage = publicPathnameRegex.test(req.nextUrl.pathname);
-    const isAllowedSubpath = pagesWithSubpaths.length > 0 && subpathRegex.test(req.nextUrl.pathname);
+  if (isPublicPage || isAllowedSubpath) {
+    return intlMiddleware(req);
+  }
 
-    if (isPublicPage || isAllowedSubpath) {
-        return intlMiddleware(req);
-    } else {
-        return (authMiddleware as (req: NextRequest) => Promise<Response>)(req);
-    }
-}
+  if (!req.auth) {
+    const loginUrl = new URL('/login', req.url);
+    loginUrl.searchParams.set('callbackUrl', req.url);
+    return NextResponse.redirect(loginUrl);
+  }
+
+  return intlMiddleware(req);
+});
 
 export const config = {
-    // Match only internationalized pathnames
-    matcher: [
-        '/',
-        '/(zh|en)/:path*',
-        '/((?!api|_next|_vercel|.*\\..*).*)'
-    ]
+  matcher: [
+    '/',
+    '/(zh|en)/:path*',
+    '/((?!api|_next|_vercel|.*\..*).*)'
+  ]
 };

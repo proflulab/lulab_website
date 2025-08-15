@@ -44,7 +44,6 @@ interface ProjectDetail {
 
 export default function ProjectDetails() {
     const params = useParams();
-    const bootcampId = params.bootcampId as string;
     const router = useRouter();
     const t = useTranslations('BootcampPage');
     const searchParams = useSearchParams();
@@ -55,8 +54,14 @@ export default function ProjectDetails() {
     const [loading, setLoading] = useState<boolean>(true);
     const [error, setError] = useState<boolean>(false);
     const [channelCode, setChannelCode] = useState<string>(''); // 默认渠道代码为空
+    
+    const bootcampId = params?.bootcampId as string;
 
     useEffect(() => {
+        // 如果没有bootcampId参数，直接返回
+        if (!bootcampId) {
+            return;
+        }
         async function fetchProject() {
             try {
                 setLoading(true);
@@ -81,16 +86,20 @@ export default function ProjectDetails() {
     // 单独处理渠道代码的 useEffect
     useEffect(() => {
         // 检查URL中是否有渠道参数
-        const channelParam = searchParams.get('channel');
+        const channelParam = searchParams?.get('channel');
         if (channelParam) {
             setChannelCode(channelParam);
         }
     }, [searchParams]);
 
+    // 如果没有bootcampId参数，返回404
+    if (!bootcampId) {
+        return notFound();
+    }
+
     if (loading) {
         return <div className="flex justify-center p-8"><LoadingSpinner /></div>;
     }
-
 
     if (error || !project) {
         return notFound();
@@ -251,4 +260,4 @@ export default function ProjectDetails() {
             </div>
         </div>
     );
-} 
+}

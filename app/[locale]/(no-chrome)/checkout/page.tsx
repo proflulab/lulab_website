@@ -26,7 +26,7 @@ export default function CheckoutPage() {
   const [clientSecret, setClientSecret] = useState<string | null>(null);
 
   useEffect(() => {
-    const channel = searchParams.get('channel');
+    const channel = searchParams?.get('channel');
     fetch("/api/stripe/checkout_sessions", {
       method: "POST",
       headers: {

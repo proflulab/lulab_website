@@ -1,0 +1,239 @@
+import { NextResponse } from 'next/server';
+import { cookies } from 'next/headers';
+import { randomBytes, createHash } from 'crypto';
+
+function generateCodeVerifier() {
+  return randomBytes(32).toString('base64url');
+}
+
+function generateCodeChallenge(verifier: string) {
+  return createHash('sha256').update(verifier).digest('base64url');
+}
+
+export async function GET(request: Request) {
+  const { searchParams } = new URL(request.url);
+  const action = searchParams.get('action');
+  const code = searchParams.get('code');
+
+  if (action === 'start') {
+    const state = randomBytes(16).toString('base64url');
+    const codeVerifier = generateCodeVerifier();
+    const codeChallenge = generateCodeChallenge(codeVerifier);
+
+    console.log('Starting OAuth flow:', {
+      state: state,
+      clientId: process.env.COZE_CLIENT_ID,
+      redirectUri: process.env.COZE_REDIRECT_URI
+    });
+
+    const authUrl = `https://api.coze.cn/api/permission/oauth2/authorize?` +
+      `client_id=${encodeURIComponent(process.env.COZE_CLIENT_ID!)}&` +
+      `redirect_uri=${encodeURIComponent(process.env.COZE_REDIRECT_URI!)}&` +
+      `response_type=code&` +
+      `state=${encodeURIComponent(state)}&` +
+      `code_challenge=${encodeURIComponent(codeChallenge)}&` +
+      `code_challenge_method=S256`;
+
+    const cookieOptions = {
+      httpOnly: true, 
+      secure: process.env.NODE_ENV === 'production',
+      sameSite: 'lax' as const,
+      maxAge: 10 * 60 // 10 minutes for temporary cookies
+    };
+
+    cookies().set('coze_code_verifier', codeVerifier, cookieOptions);
+    cookies().set('coze_state', state, cookieOptions);
+
+    return NextResponse.redirect(authUrl);
+  } else if (code) {
+    // Callback - only process if we have a code parameter
+    const state = searchParams.get('state');
+    const storedState = cookies().get('coze_state')?.value;
+    
+    console.log('Processing OAuth callback:', {
+      hasCode: !!code,
+      receivedState: state,
+      storedState: storedState,
+      allParams: Object.fromEntries(searchParams.entries())
+    });
+
+    // Validate state parameter
+    if (!state || !storedState || state !== storedState) {
+      console.error('State validation failed:', {
+        receivedState: state,
+        storedState: storedState,
+        stateMatch: state === storedState
+      });
+      
+      // Clear temporary cookies
+      cookies().delete('coze_code_verifier');
+      cookies().delete('coze_state');
+      
+      const redirectUrl = new URL('/?error=invalid_state', request.url);
+      return NextResponse.redirect(redirectUrl);
+    }
+    
+    // Validate code parameter
+    if (!code) {
+      console.error('Missing authorization code');
+      
+      // Clear temporary cookies
+      cookies().delete('coze_code_verifier');
+      cookies().delete('coze_state');
+      
+      const redirectUrl = new URL('/?error=missing_code', request.url);
+      return NextResponse.redirect(redirectUrl);
+    }
+
+    const verifier = cookies().get('coze_code_verifier')?.value;
+    if (!verifier) {
+      return NextResponse.json({ error: 'Missing code verifier' }, { status: 400 });
+    }
+
+    try {
+      // 准备token请求参数
+      const tokenRequestBody = new URLSearchParams({
+        grant_type: 'authorization_code',
+        client_id: process.env.COZE_CLIENT_ID!,
+        redirect_uri: process.env.COZE_REDIRECT_URI!,
+        code: code,
+        code_verifier: verifier,
+      });
+
+      // 移动端/PC桌面端/单页面应用不使用客户端密钥
+      // 使用PKCE流程确保安全性
+
+      // 发送token交换请求
+      const tokenResponse = await fetch('https://api.coze.cn/api/permission/oauth2/token', {
+        method: 'POST',
+        headers: { 
+          'Content-Type': 'application/x-www-form-urlencoded',
+          'Accept': 'application/json'
+        },
+        body: tokenRequestBody.toString(),
+      });
+
+      if (!tokenResponse.ok) {
+        const errorText = await tokenResponse.text();
+        console.error('Token exchange failed:', {
+          status: tokenResponse.status,
+          statusText: tokenResponse.statusText,
+          error: errorText,
+          requestData: {
+            grant_type: 'authorization_code',
+            client_id: process.env.COZE_CLIENT_ID,
+            redirect_uri: process.env.COZE_REDIRECT_URI,
+            code: code.substring(0, 10) + '...', // 只显示部分code用于调试
+          }
+        });
+        
+        // 清理临时cookies
+        cookies().delete('coze_code_verifier');
+        cookies().delete('coze_state');
+        
+        const redirectUrl = new URL(`/?error=token_exchange_failed&details=${encodeURIComponent(errorText)}`, request.url);
+        return NextResponse.redirect(redirectUrl);
+      }
+
+      const tokenData = await tokenResponse.json();
+      
+      // 验证token响应数据
+      if (!tokenData.access_token) {
+        console.error('Invalid token response: missing access_token', tokenData);
+        cookies().delete('coze_code_verifier');
+        cookies().delete('coze_state');
+        const redirectUrl = new URL('/?error=invalid_token_response', request.url);
+        return NextResponse.redirect(redirectUrl);
+      }
+
+      // 获取用户信息
+      const userResponse = await fetch('https://api.coze.cn/oauth2/userinfo', {
+        headers: { 
+          'Authorization': `Bearer ${tokenData.access_token}`,
+          'Accept': 'application/json'
+        },
+      });
+
+      if (!userResponse.ok) {
+        const errorText = await userResponse.text();
+        console.error('User info request failed:', {
+          status: userResponse.status,
+          statusText: userResponse.statusText,
+          error: errorText
+        });
+        
+        // 清理临时cookies
+        cookies().delete('coze_code_verifier');
+        cookies().delete('coze_state');
+        
+        const redirectUrl = new URL(`/?error=user_info_failed&details=${encodeURIComponent(errorText)}`, request.url);
+        return NextResponse.redirect(redirectUrl);
+      }
+
+      const user = await userResponse.json();
+      
+      // 验证用户数据
+      if (!user.user_id) {
+        console.error('Invalid user response: missing user_id', user);
+        cookies().delete('coze_code_verifier');
+        cookies().delete('coze_state');
+        const redirectUrl = new URL('/?error=invalid_user_data', request.url);
+        return NextResponse.redirect(redirectUrl);
+      }
+
+      // 只存储必需的用户信息以减少 cookie 大小
+      const essentialUserInfo = {
+        user_id: user.user_id,
+        // 如果需要其他字段，可以添加，但保持最小化
+      };
+
+      // 设置cookies，包含过期时间
+      const cookieOptions = {
+        httpOnly: true,
+        secure: process.env.NODE_ENV === 'production',
+        sameSite: 'lax' as const
+      };
+
+      // 设置用户信息cookie（24小时过期）
+      cookies().set('coze_user_info', JSON.stringify(essentialUserInfo), {
+        ...cookieOptions,
+        maxAge: 24 * 60 * 60 // 24小时
+      });
+      
+      // 设置访问令牌cookie（1小时过期）
+      cookies().set('coze_access_token', tokenData.access_token, {
+        ...cookieOptions,
+        maxAge: 60 * 60 // 1小时
+      });
+      
+      // 设置刷新令牌cookie（30天过期）
+      if (tokenData.refresh_token) {
+        cookies().set('coze_refresh_token', tokenData.refresh_token, {
+          ...cookieOptions,
+          maxAge: 30 * 24 * 60 * 60 // 30天
+        });
+      }
+
+      // 清理临时cookies
+      cookies().delete('coze_code_verifier');
+      cookies().delete('coze_state');
+
+      // 重定向到首页，带上成功标识
+      const redirectUrl = new URL('/?auth=success', request.url);
+      return NextResponse.redirect(redirectUrl);
+      
+    } catch (error) {
+      console.error('OAuth callback error:', error);
+      
+      // 清理临时cookies
+      cookies().delete('coze_code_verifier');
+      cookies().delete('coze_state');
+      
+      const redirectUrl = new URL('/?error=oauth_callback_failed', request.url);
+      return NextResponse.redirect(redirectUrl);
+    }
+  } else {
+    // Invalid request - neither start action nor callback code
+    return NextResponse.json({ error: 'Invalid request. Use ?action=start to initiate OAuth or provide code parameter for callback.' }, { status: 400 });
+  }
+}

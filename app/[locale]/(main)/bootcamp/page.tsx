@@ -59,7 +59,7 @@ export default function BootcampPage() {
     // 单独处理渠道代码的 useEffect
     useEffect(() => {
         // 检查URL中是否有渠道参数
-        const channelParam = searchParams.get('channel');
+        const channelParam = searchParams?.get('channel');
         if (channelParam) {
             setChannelCode(channelParam);
         }

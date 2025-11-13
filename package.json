@@ -10,6 +10,8 @@
   },
   "dependencies": {
     "@auth/neon-adapter": "^1.8.0",
+    "@coze/api": "^1.3.5",
+    "@coze/chat-sdk": "^0.1.11-beta.19",
     "@emotion/react": "^11.13.5",
     "@emotion/styled": "^11.13.5",
     "@mui/icons-material": "^6.1.8",
@@ -39,8 +41,8 @@
     "gray-matter": "^4.0.3",
     "lucide-react": "^0.460.0",
     "motion": "^11.11.17",
-    "next": "14.2.16",
-    "next-auth": "^4.24.11",
+    "next": "^14.2.16",
+    "next-auth": "^5.0.0-beta.29",
     "next-intl": "^3.26.1",
     "next-themes": "^0.4.3",
     "nodemailer": "^6.10.0",
@@ -56,13 +58,15 @@
     "tailwind-merge": "^2.5.4",
     "tailwindcss-animate": "^1.0.7",
     "three": "^0.172.0",
-    "three-mesh-bvh": "^0.8.0"
+    "three-mesh-bvh": "^0.8.0",
+    "uuid": "^8.3.2"
   },
   "devDependencies": {
     "@types/node": "^20",
     "@types/react": "^18",
     "@types/react-dom": "^18",
-    "eslint": "^8",
+    "@types/uuid": "^10.0.0",
+    "eslint": "^8.57.1",
     "eslint-config-next": "14.2.16",
     "postcss": "^8",
     "tailwindcss": "^3.4.1",

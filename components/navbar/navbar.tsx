@@ -33,7 +33,8 @@ const Navbar = () => {
     const [scrolled, setScrolled] = useState(false);
     const router = useRouter();
     const pathname = usePathname();
-    const { locale = 'zh' } = useParams();
+    const params = useParams();
+    const locale = (params?.locale as string) || 'zh';
     const isMobile = useMediaQuery('(max-width: 768px)');
 
     const t = useTranslations('AppNav');

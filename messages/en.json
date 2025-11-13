@@ -187,6 +187,10 @@
       ]
     }
   },
+  "CozeChat": {
+    "botchat": "AI Customer service"
+},
+
   "BootcampPage": {
     "Hero": {
       "title": "In Lulab Bootcamp",

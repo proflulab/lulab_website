@@ -17,7 +17,8 @@
     "login": "登录",
     "sign_up": "注册",
     "log_out": "退出",
-    "bootcamp": "训练营"
+    "bootcamp": "训练营",
+    "jobs": "招聘"
   },
   "HomePage": {
     "concept": "学理论不如学案例\n学案例不如做案例\n做案例不如玩案例\n一个人玩不如一起玩\n一起玩不如聚天下英才名师一块玩",
@@ -272,6 +273,20 @@
     "buttons": {
       "returnHome": "返回首页",
       "viewOrders": "查看订单"
+    }
+  },
+  "JobsPage": {
+    "title": "招聘",
+    "subtitle": "在此直接浏览飞书云文档中的最新岗位信息",
+    "openInFeishu": "在飞书中打开",
+    "preview": "站内预览",
+    "warning": {
+      "title": "该链接可能无法在站内直接预览",
+      "desc": "当前链接看起来需要登录或返回了接口错误。请将飞书文档设置为可公开访问（用无痕窗口测试），或点击「在飞书中打开」。"
+    },
+    "missing": {
+      "title": "尚未配置招聘文档链接",
+      "desc": "请在环境变量 NEXT_PUBLIC_FEISHU_JOBS_DOC_URL 中填写飞书云文档的可公开访问链接。"
     }
   }
 }

@@ -93,6 +93,9 @@ EMAIL_SERVER_PORT=587
 EMAIL_SERVER_USER=your_email_user
 EMAIL_SERVER_PASSWORD=your_email_password
 EMAIL_FROM=your_email_from
+
+# 招聘页面配置
+NEXT_PUBLIC_FEISHU_JOBS_DOC_URL=https://your_feishu_doc_link
 ```
 
 ### 启动开发服务器

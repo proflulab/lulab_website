@@ -17,7 +17,8 @@
     "login": "Login",
     "sign_up": "Sign Up",
     "log_out": "Log Out",
-    "bootcamp": "Bootcamp"
+    "bootcamp": "Bootcamp",
+    "jobs": "Jobs"
   },
   "HomePage": {
     "concept": "It is better to learn cases than to learn theory \nIt is better to learn from cases than to do them\nIt is better to play with cases than to make cases\nPlaying alone is worse than playing together\nIt is better to gather the best and most talented teachers from all over the world to play together",
@@ -272,6 +273,20 @@
     "buttons": {
       "returnHome": "Return Home",
       "viewOrders": "View Orders"
+    }
+  },
+  "JobsPage": {
+    "title": "Jobs",
+    "subtitle": "Browse the latest openings directly from our Feishu doc without leaving the site.",
+    "openInFeishu": "Open in Feishu",
+    "preview": "Preview on this page",
+    "warning": {
+      "title": "This link may not be previewable here",
+      "desc": "The link appears to require login or returned an API error. Make the Feishu document publicly accessible (test in an incognito window), or open it in Feishu."
+    },
+    "missing": {
+      "title": "Jobs doc URL not configured",
+      "desc": "Set NEXT_PUBLIC_FEISHU_JOBS_DOC_URL to the publicly accessible Feishu document link."
     }
   }
 }

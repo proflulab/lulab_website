@@ -20,6 +20,7 @@ const publicPages = [
     '/login',
     '/bootcamp',
     '/about',
+    '/jobs',
     '/checkout',
     '/agreement.html',
 ];

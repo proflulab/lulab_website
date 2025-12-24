@@ -12,13 +12,18 @@
 import { NextIntlClientProvider } from 'next-intl';
 import { getMessages } from 'next-intl/server';
 import React from 'react';
+import type { Metadata } from 'next';
 import "./globals.css";
 import { Toaster } from "@/components/ui/toaster"
+import { getBaseMetadata } from '@/lib/seo';
 
-export const metadata = {
-  title: 'Lu Lab',
-  description: 'Lu Lab Website',
-};
+export async function generateMetadata({
+  params: { locale }
+}: {
+  params: { locale: string };
+}): Promise<Metadata> {
+  return getBaseMetadata(locale);
+}
 
 export default async function RootLayout({
   children,
@@ -32,10 +37,6 @@ export default async function RootLayout({
 
   return (
     <html lang={locale}>
-      <head>
-        <meta charSet="utf-8" />
-        <meta name="viewport" content="width=device-width, initial-scale=1" />
-      </head>
       <body>
         <NextIntlClientProvider messages={messages}>
           <div className="flex flex-col min-h-screen">

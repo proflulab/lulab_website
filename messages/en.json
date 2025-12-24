@@ -24,10 +24,10 @@
     "Hero": {
       "title": "Educational Innovation in an Era of Change",
       "titleHighlight": "",
-      "subtitle": "Explore new paradigms of education: practice-driven, project-oriented, elite aggregation, and collaborative win-win",
+      "subtitle": "Explore our way of education: practice-driven, project-oriented, authentic, and collaborative",
       "enrollButton": "Enroll Now",
       "learnMoreButton": "Learn More",
-      "tagline": "Cultivating versatile talents with global vision and innovative spirit"
+      "tagline": "Cultivating talent with versatile skills and global perspectives"
     }
   },
   "NotFoundPage": {
@@ -68,15 +68,15 @@
       "title": "About Us",
       "mission": {
         "title": "Mission",
-        "content": "Through project-based learning and innovative education, we cultivate versatile talents with global vision, innovative spirit, and practical abilities, helping young students achieve unconventional self-realization."
+        "content": "Our mission is to help students achieve unconventional self-actualization through project-based learning and learning by doing."
       },
       "vision": {
         "title": "Vision",
-        "content": "To create an online Stanford University with soul, promote educational reform, and cultivate innovative talents capable of meeting future challenges for modern society."
+        "content": "Our vision is to create a vibrant online educational community, promote educational reform, and cultivate innovative leaders capable of meeting future challenges for our global society."
       },
       "goal": {
         "title": "Educational Goals",
-        "content": "We cultivate versatile talents with global vision, innovative spirit, and practical abilities. Through project-based learning and practice, students explore their interests and strengths in real-world problems, quickly identifying career directions. We emphasize practice-first, lifelong learning, and team collaboration, helping students achieve unconventional personal development and career breakthroughs while promoting educational equity and social progress."
+        "content": "We cultivate versatile young talent with global perspective, innovative thinking, and practical abilities. Through project-based learning, students explore their interests and strengths in real-world problems, quickly identifying potential career directions. We emphasize lifelong learning and team collaboration, helping students achieve personal development and self-actualization while promoting educational equity and social progress."
       }
     },
     "Founder": {
